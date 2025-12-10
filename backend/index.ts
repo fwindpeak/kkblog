@@ -6,12 +6,24 @@ const FRONTEND_DIR = "../frontend";
 
 const db = new Database("blog.db");
 // 确保表结构存在
+// 1. 初始化表结构 (增加 thoughts 表)
 db.run(`
   CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     slug TEXT UNIQUE,
     title TEXT,
     content TEXT,
+    excerpt TEXT,
+    tags TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
+db.run(`
+  CREATE TABLE IF NOT EXISTS thoughts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    content TEXT,
+    mood TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
@@ -41,47 +53,90 @@ const server = Bun.serve({
             }
         }
 
-        // --- API ---
+        // --- API: Posts (博客文章) ---
 
-        // 1. 列表
         if (method === "GET" && url.pathname === "/api/posts") {
             const posts = db.query("SELECT * FROM posts ORDER BY created_at DESC").all();
-            return new Response(JSON.stringify(posts), { headers });
+            // 解析 tags 字符串为数组
+            const parsedPosts = posts.map((p: any) => ({
+                ...p,
+                tags: p.tags ? JSON.parse(p.tags) : []
+            }));
+            return new Response(JSON.stringify(parsedPosts), { headers });
         }
 
-        // 2. 保存 (新建或更新)
+        if (method === "GET" && url.pathname.startsWith("/api/post/")) {
+            const slug = url.pathname.split("/").pop();
+            const post = db.query("SELECT * FROM posts WHERE slug = $slug").get({ $slug: slug });
+            if (post) {
+                return new Response(JSON.stringify(post), { headers });
+            }
+            return new Response(JSON.stringify({ error: "Not Found" }), { status: 404, headers });
+        }
+
         if (method === "POST" && url.pathname === "/api/post") {
             try {
                 const body = await req.json();
-                const { slug, title, content } = body;
+                const { slug, title, content, tags } = body;
+
+                // 自动生成 excerpt (摘要)
+                const plainText = content.replace(/[#*`!\[\]\(\)]/g, '').substring(0, 100) + '...';
+                const tagsStr = JSON.stringify(tags || []);
+
                 const query = db.query(`
-          INSERT INTO posts (slug, title, content) VALUES ($slug, $title, $content)
-          ON CONFLICT(slug) DO UPDATE SET title=$title, content=$content
+          INSERT INTO posts (slug, title, content, excerpt, tags) VALUES ($slug, $title, $content, $excerpt, $tagsStr)
+          ON CONFLICT(slug) DO UPDATE SET title=$title, content=$content, excerpt=$excerpt, tags=$tagsStr
         `);
-                query.run({ $slug: slug, $title: title, $content: content });
+                query.run({ $slug: slug, $title: title, $content: content, $excerpt: plainText, $tagsStr: tagsStr });
                 return new Response(JSON.stringify({ success: true }), { headers });
             } catch (e) {
                 return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers });
             }
         }
 
-        // 3. 删除 (新功能)
         if (method === "DELETE" && url.pathname.startsWith("/api/post/")) {
-            const slug = url.pathname.split("/").pop(); // 获取 /api/post/slug 中的 slug
+            const slug = url.pathname.split("/").pop();
             db.query("DELETE FROM posts WHERE slug = $slug").run({ $slug: slug });
             return new Response(JSON.stringify({ success: true }), { headers });
         }
 
-        // 4. 构建
-        if (method === "POST" && url.pathname === "/api/build") {
+        // --- API: Thoughts (随笔) ---
+
+        if (method === "GET" && url.pathname === "/api/thoughts") {
+            const thoughts = db.query("SELECT * FROM thoughts ORDER BY created_at DESC").all();
+            return new Response(JSON.stringify(thoughts), { headers });
+        }
+
+        if (method === "POST" && url.pathname === "/api/thought") {
             try {
-                const proc = Bun.spawn(["npm", "run", "build"], { cwd: FRONTEND_DIR });
-                await proc.exited;
-                return new Response(JSON.stringify({ status: "Build Complete" }), { headers });
-            } catch (err) {
-                return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers });
+                const body = await req.json();
+                const { content, mood } = body;
+                // 简单的插入，随笔暂时不做 update，只做 append
+                const query = db.query("INSERT INTO thoughts (content, mood) VALUES ($content, $mood)");
+                query.run({ $content: content, $mood: mood || 'neutral' });
+                return new Response(JSON.stringify({ success: true }), { headers });
+            } catch (e) {
+                return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers });
             }
         }
+
+        if (method === "DELETE" && url.pathname.startsWith("/api/thought/")) {
+            const id = url.pathname.split("/").pop();
+            db.query("DELETE FROM thoughts WHERE id = $id").run({ $id: id });
+            return new Response(JSON.stringify({ success: true }), { headers });
+        }
+
+        // --- 构建触发器 ---
+        if (method === "POST" && url.pathname === "/api/build") {
+            // ... 保持原有构建逻辑 ...
+            // 确保 cwd 指向你的 Astro 项目目录
+            const proc = Bun.spawn(["npm", "run", "build"], { cwd: "../frontend" });
+            return new Response(JSON.stringify({ status: "Build Triggered" }), { headers });
+        }
+
+        // --- 静态文件托管 (可选，用于本地预览) ---
+        // 如果 Astro build 到了 ../frontend/dist
+        // ... 参考上一个回答的静态托管逻辑 ...
 
         return new Response("Not Found", { status: 404, headers });
     },

@@ -1,0 +1,44 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// 构建时获取数据
+const response = await fetch('http://localhost:3000/api/posts');
+const posts = await response.json();
+---
+
+<Layout title="文章">
+    <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative z-10">
+        <div class="flex items-center justify-between border-b border-slate-300 pb-4">
+            <h2 class="text-3xl font-serif text-slate-900">书写文字</h2>
+        </div>
+
+        <div class="space-y-12">
+            {posts.map((post: any) => (
+                <article class="group block relative">
+                    <div class="flex items-center gap-3 text-sm text-gray-400 font-sans mb-2">
+                        <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                        <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                        {/* 假设你会在后端计算 readTime，或者这里暂时写死 */}
+                        <span>5 min read</span>
+                    </div>
+                    
+                    <h3 class="text-2xl font-serif font-bold text-slate-900 mb-3 group-hover:text-blue-700 transition-colors">
+                        <a href={`/blog/${post.slug}`} class="before:absolute before:inset-0">{post.title}</a>
+                    </h3>
+                    
+                    <p class="text-slate-500 leading-relaxed font-serif line-clamp-3">
+                        {post.excerpt}
+                    </p>
+                    
+                    {post.tags && post.tags.length > 0 && (
+                        <div class="flex gap-2 mt-4 relative z-10">
+                            {post.tags.map((tag: string) => (
+                                <span class="text-xs bg-slate-200 text-slate-900 px-2 py-1 rounded-md font-sans opacity-70">#{tag}</span>
+                            ))}
+                        </div>
+                    )}
+                </article>
+            ))}
+        </div>
+    </div>
+</Layout>

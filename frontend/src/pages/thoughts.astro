@@ -1,0 +1,50 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { marked } from 'marked';
+
+const response = await fetch('http://localhost:3000/api/thoughts');
+const thoughts = await response.json();
+
+// 预处理 Markdown，Astro 支持在 Frontmatter 写顶层 await
+const processedThoughts = await Promise.all(thoughts.map(async (t: any) => ({
+    ...t,
+    html: await marked.parse(t.content)
+})));
+
+const moodMap: Record<string, string> = {
+    'neutral': '平静',
+    'happy': '愉快',
+    'pensive': '沉思',
+    'excited': '兴奋'
+};
+---
+
+<Layout title="随笔">
+    <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative z-10">
+        <div class="flex justify-between items-baseline border-b border-slate-300 pb-4">
+            <h2 class="text-3xl font-serif text-slate-900">瞬息念头</h2>
+        </div>
+        
+        <div class="grid gap-6">
+            {processedThoughts.map((thought) => (
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 relative overflow-hidden group">
+                    {/* Decorative tape */}
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-6 bg-yellow-100/50 rotate-1 shadow-sm backdrop-blur-sm border-l border-r border-white/50"></div>
+                    
+                    <div class="text-lg font-serif text-slate-900 leading-relaxed prose prose-p:my-1 prose-img:rounded-lg prose-img:shadow-sm" set:html={thought.html} />
+                    
+                    <div class="mt-4 flex justify-between items-center border-t border-slate-100 pt-3">
+                        <div class="text-xs text-gray-400 font-sans flex gap-2 items-center">
+                            <span>{new Date(thought.created_at).toLocaleString()}</span>
+                            {thought.mood && (
+                                <span class="uppercase tracking-widest opacity-50 border border-gray-200 px-1 rounded">
+                                    {moodMap[thought.mood] || thought.mood}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+</Layout>

@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="工具">
+    <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative z-10">
+        <header class="flex items-baseline justify-between border-b border-slate-300 pb-4">
+            <h2 class="text-3xl font-serif text-slate-900">工坊</h2>
+            <span class="font-mono text-xs text-slate-400 tracking-wider">V1.0.4</span>
+        </header>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="group relative bg-slate-100 rounded-lg p-6 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-colors">
+                <div class="absolute top-4 right-4 text-xs font-mono text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">
+                    UTIL-01
+                </div>
+                <div class="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center mb-4 text-xl">
+                    🎨
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 font-sans mb-2">配色生成器</h3>
+                <p class="text-sm text-slate-500 mb-6 font-serif leading-relaxed">
+                    从上传的图片中提取主色调，并生成语义化的 Tailwind 配置。
+                </p>
+                <button class="w-full py-2 bg-white border border-slate-300 rounded font-mono text-xs text-slate-900 uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-colors shadow-sm">
+                    启动
+                </button>
+            </div>
+    
+            {/* 更多工具卡片... */}
+        </div>
+    </div>
+</Layout>

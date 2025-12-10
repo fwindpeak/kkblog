@@ -1,36 +1,35 @@
 ---
-// src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
-
-// 定义数据接口
-interface Post {
-  id: number;
-  slug: string;
-  title: string;
-  created_at: string;
-}
-
-// --- 关键：构建时数据获取 ---
-// Astro 会在执行 `npm run build` 时运行这段代码
-const response = await fetch('http://localhost:3000/api/posts');
-const posts: Post[] = await response.json();
 ---
 
 <Layout title="首页">
-	<h1>最新文章</h1>
+    <div class="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10">
+        <header class="space-y-6 text-center md:text-left">
+          <div class="inline-block p-1 rounded-full border border-slate-300 bg-white shadow-sm">
+            <img 
+                src="https://picsum.photos/100/100" 
+                alt="Profile" 
+                class="w-20 h-20 rounded-full grayscale hover:grayscale-0 transition-all duration-500" 
+            />
+          </div>
+          <h1 class="text-4xl md:text-5xl font-serif text-slate-900 tracking-tight leading-tight">
+            收集片刻 <br/> 
+            <span class="text-slate-500 italic">于静止与喧嚣之中。</span>
+          </h1>
+          <p class="max-w-xl text-lg text-slate-500 leading-relaxed font-sans">
+            你好，我是一名数字园丁。这是我耕耘的一方天地，用于培育想法、设计系统，偶尔与人工智能对话。
+          </p>
+        </header>
     
-    {posts.length === 0 ? (
-        <p>暂时还没有文章，快去 Admin 后台写一篇吧！</p>
-    ) : (
-        <ul style="list-style: none; padding: 0;">
-            {posts.map((post) => (
-                <li style="margin-bottom: 20px; border: 1px solid #eee; padding: 15px; border-radius: 8px;">
-                    <h2 style="margin: 0 0 10px 0;">
-                        <a href={`/posts/${post.slug}`}>{post.title}</a>
-                    </h2>
-                    <small style="color: #666;">发布于: {new Date(post.created_at).toLocaleDateString()}</small>
-                </li>
-            ))}
-        </ul>
-    )}
+        <section class="grid md:grid-cols-2 gap-6">
+           <a href="/blog" class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group">
+              <h3 class="font-sans font-bold text-gray-400 text-xs uppercase tracking-wider mb-2">最新文章</h3>
+              <p class="text-xl font-serif text-slate-900 group-hover:text-blue-700 transition-colors">前往阅读我的长篇思考</p>
+           </a>
+           <a href="/thoughts" class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer group">
+              <h3 class="font-sans font-bold text-gray-400 text-xs uppercase tracking-wider mb-2">近期想法</h3>
+              <p class="text-xl font-serif text-slate-900 group-hover:text-blue-700 transition-colors">查看我的碎片化记录</p>
+           </a>
+        </section>
+      </div>
 </Layout>

@@ -1,10 +1,22 @@
 ---
-// src/layouts/Layout.astro
+import '../globals.css'
+import IconHome from '../components/icons/IconHome.astro';
+import IconBook from '../components/icons/IconBook.astro';
+import IconChatBubble from '../components/icons/IconChatBubble.astro';
+import IconWrench from '../components/icons/IconWrench.astro';
 interface Props {
 	title: string;
 }
 
 const { title } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+// 简单的辅助函数判断链接是否激活
+const isActive = (path: string) => {
+    if (path === '/' && currentPath === '/') return true;
+    if (path !== '/' && currentPath.startsWith(path)) return true;
+    return false;
+};
 ---
 
 <!doctype html>
@@ -12,21 +24,59 @@ const { title } = Astro.props;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<title>{title} - 我的博客</title>
-        <style is:global>
-            /* 简单的全局样式 */
-            body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; color: #333; }
-            a { color: #2563eb; text-decoration: none; }
-            a:hover { text-decoration: underline; }
-            pre { background: #f4f4f5; padding: 15px; border-radius: 8px; overflow-x: auto; }
-            img { max-width: 100%; height: auto; border-radius: 8px; }
-            nav { margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        </style>
+		<title>{title} - 我的数字花园</title>
+        <meta name="description" content="收集片刻，于静止与喧嚣之中。" />
 	</head>
-	<body>
-        <nav>
-            <a href="/" style="font-weight: bold; font-size: 1.2rem;">🏠 My Blog</a>
-        </nav>
-		<slot />
+	<body class="bg-gray-100 h-screen overflow-hidden text-slate-800">
+        <div class="relative h-full w-full flex flex-col md:flex-row max-w-7xl mx-auto md:p-8">
+            
+            {/* Navigation Dock */}
+            <nav class="
+                fixed bottom-6 left-1/2 -translate-x-1/2 md:translate-x-0 md:static md:w-24 md:h-full z-40
+                flex md:flex-col items-center justify-center md:justify-start gap-2 md:gap-6
+                p-2 md:py-8 rounded-full md:rounded-2xl
+                bg-white/80 backdrop-blur-md shadow-xl border border-white/50
+                transition-all duration-300
+            ">
+                <a href="/" class={`group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive('/') ? 'bg-slate-200 text-slate-900 shadow-inner translate-y-px' : 'text-gray-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'}`}>
+                    <IconHome class="w-6 h-6" />
+                    <span class="sr-only">首页</span>
+                </a>
+                
+                <a href="/blog" class={`group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive('/blog') ? 'bg-slate-200 text-slate-900 shadow-inner translate-y-px' : 'text-gray-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'}`}>
+                    <IconBook class="w-6 h-6" />
+                    <span class="sr-only">文章</span>
+                </a>
+
+                <a href="/thoughts" class={`group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive('/thoughts') ? 'bg-slate-200 text-slate-900 shadow-inner translate-y-px' : 'text-gray-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'}`}>
+                    <IconChatBubble class="w-6 h-6" />
+                    <span class="sr-only">随笔</span>
+                </a>
+
+                <a href="/tools" class={`group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive('/tools') ? 'bg-slate-200 text-slate-900 shadow-inner translate-y-px' : 'text-gray-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'}`}>
+                    <IconWrench class="w-6 h-6" />
+                    <span class="sr-only">工具</span>
+                </a>
+            </nav>
+
+            {/* Main Content Paper */}
+            <main class="
+                flex-1 h-full overflow-hidden relative
+                md:ml-8 rounded-none md:rounded-3xl
+                bg-[#fdfbf7] shadow-2xl border border-white/40
+            ">
+                {/* Texture Overlay */}
+                <div class="absolute inset-0 pointer-events-none opacity-50 mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');"></div>
+
+                {/* Scrollable Area */}
+                <div class="h-full overflow-y-auto px-6 py-24 md:p-12 scroll-smooth">
+                    <slot />
+
+                    <div class="mt-20 pt-8 border-t border-slate-200 text-center text-slate-400 text-sm font-serif italic relative z-10">
+                        基于 Astro & Bun 构建
+                    </div>
+                </div>
+            </main>
+        </div>
 	</body>
 </html>
