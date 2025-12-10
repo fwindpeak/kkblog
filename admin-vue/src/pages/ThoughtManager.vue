@@ -4,6 +4,7 @@ import { request } from '../lib/api';
 
 import { useImageUpload } from '../hooks/useImageUpload';
 import { IconTrash, IconPen, IconImage } from '../components/Icons';
+import { marked } from 'marked';
 
 interface Thought {
     id?: number;
@@ -112,6 +113,10 @@ const handleDelete = async (id: number) => {
     loadThoughts();
 };
 
+function toHtml(content: string) {
+    return marked.parse(content) || '';
+}
+
 onMounted(loadThoughts);
 </script>
 <template>
@@ -166,7 +171,9 @@ onMounted(loadThoughts);
                         </button>
                     </div>
 
-                    <div class="prose prose-sm mb-2 text-slate-800 font-serif whitespace-pre-wrap">{{ thought.content }}
+                    <div class="prose prose-sm mb-2 text-slate-800 font-serif whitespace-pre-wrap"
+                        v-html="toHtml(thought.content)">
+
                     </div>
 
                     <div class="flex items-center gap-2 text-xs text-slate-400 font-mono">
