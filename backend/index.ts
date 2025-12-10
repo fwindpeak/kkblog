@@ -32,6 +32,7 @@ db.run(`
 `);
 
 const server = Bun.serve({
+    hostname: Bun.env.SERVER_HOST || "0.0.0.0",
     port: Number(Bun.env.SERVER_PORT) || 3000,
     // 增大最大请求体大小 (默认较小，传图片可能不够)
     maxRequestBodySize: 1024 * 1024 * 50, // 50MB
@@ -96,7 +97,7 @@ const server = Bun.serve({
 
                 // 返回完整的访问 URL
                 // 注意：如果你部署到线上，这里要改成你的域名
-                const fileUrl = `http://localhost:3000/api/uploads/${fileName}`;
+                const fileUrl = `${Bun.env.SERVER_HOST || "localhost"}:${Bun.env.SERVER_PORT || 3000}/api/uploads/${fileName}`;
 
                 return new Response(JSON.stringify({ success: true, url: fileUrl }), { headers: { ...headers, "Content-Type": "application/json" } });
 
@@ -221,4 +222,4 @@ const server = Bun.serve({
     },
 });
 
-console.log(`Backend running on http://localhost:${server.port}`);
+console.log(`Backend running on http://${server.hostname}:${server.port}`);

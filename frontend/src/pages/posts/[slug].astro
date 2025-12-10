@@ -7,7 +7,7 @@ import { marked } from 'marked';
 // 这个函数必须存在，用于 SSG
 export async function getStaticPaths() {
   // 请求后端获取所有文章
-  const response = await fetch('http://localhost:3000/api/posts');
+  const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/posts`);
   const posts = await response.json();
 
   // 返回一个数组，告诉 Astro 要生成哪些页面

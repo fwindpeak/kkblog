@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { marked } from 'marked';
 
-const response = await fetch('http://localhost:3000/api/thoughts');
+const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/thoughts`);
 const thoughts = await response.json();
 
 // 预处理 Markdown，Astro 支持在 Frontmatter 写顶层 await
