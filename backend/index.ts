@@ -32,7 +32,7 @@ db.run(`
 `);
 
 const server = Bun.serve({
-    port: 3000,
+    port: Number(Bun.env.SERVER_PORT) || 3000,
     // 增大最大请求体大小 (默认较小，传图片可能不够)
     maxRequestBodySize: 1024 * 1024 * 50, // 50MB
     async fetch(req) {
