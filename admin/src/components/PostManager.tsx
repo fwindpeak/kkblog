@@ -1,5 +1,5 @@
 // src/components/PostManager.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Post } from '../types';
 import { request } from '../lib/api';
 import { IconPen, IconTrash } from './Icons';
@@ -12,14 +12,19 @@ export const PostManager: React.FC = () => {
     const [formData, setFormData] = useState<Post>({ slug: '', title: '', content: '', tags: [] });
     const [tagsInput, setTagsInput] = useState(''); // 临时存储输入的标签字符串
 
-    const loadPosts = async () => {
+
+    const loadPosts = useCallback(async () => {
         const data = await request<Post[]>('/api/posts');
-        if (data) setPosts(data);
-    };
+        if (data) {
+            setPosts(data);
+        }
+    }, []);
 
     useEffect(() => {
         loadPosts();
-    }, []);
+    }, [loadPosts]);
+
+
 
 
     const handleEdit = (post: Post) => {

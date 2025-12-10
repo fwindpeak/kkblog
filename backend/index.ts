@@ -84,7 +84,8 @@ const server = Bun.serve({
                 const tagsStr = JSON.stringify(tags || []);
 
                 const query = db.query(`
-          INSERT INTO posts (slug, title, content, excerpt, tags) VALUES ($slug, $title, $content, $excerpt, $tagsStr)
+          INSERT INTO posts (slug, title, content, excerpt, tags, created_at) 
+          VALUES ($slug, $title, $content, $excerpt, $tagsStr, datetime('now', '+08:00'))
           ON CONFLICT(slug) DO UPDATE SET title=$title, content=$content, excerpt=$excerpt, tags=$tagsStr
         `);
                 query.run({ $slug: slug, $title: title, $content: content, $excerpt: plainText, $tagsStr: tagsStr });
@@ -110,10 +111,25 @@ const server = Bun.serve({
         if (method === "POST" && url.pathname === "/api/thought") {
             try {
                 const body = await req.json();
-                const { content, mood } = body;
-                // 简单的插入，随笔暂时不做 update，只做 append
-                const query = db.query("INSERT INTO thoughts (content, mood) VALUES ($content, $mood)");
-                query.run({ $content: content, $mood: mood || 'neutral' });
+                const { id, content, mood } = body as { id?: number; content: string; mood?: string }; // 🟢 获取 id
+
+                if (id) {
+                    // 🟢 如果有 ID，执行 UPDATE
+                    // 注意：随笔修改通常不更新 created_at，保持“原汁原味”
+                    const query = db.query(`
+                    UPDATE thoughts 
+                    SET content = $content, mood = $mood 
+                    WHERE id = $id
+                `);
+                    query.run({ $content: content, $mood: mood || 'neutral', $id: id });
+                } else {
+                    // 🟢 没有 ID，执行 INSERT (保持之前的东八区时间逻辑)
+                    const query = db.query(`
+                    INSERT INTO thoughts (content, mood, created_at) 
+                    VALUES ($content, $mood, datetime('now', '+08:00'))
+                `);
+                    query.run({ $content: content, $mood: mood || 'neutral' });
+                }
                 return new Response(JSON.stringify({ success: true }), { headers });
             } catch (e) {
                 return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers });
@@ -121,7 +137,7 @@ const server = Bun.serve({
         }
 
         if (method === "DELETE" && url.pathname.startsWith("/api/thought/")) {
-            const id = url.pathname.split("/").pop();
+            const id = url.pathname.split("/").pop(); // 🟢 确保 ID 是数字
             db.query("DELETE FROM thoughts WHERE id = $id").run({ $id: id });
             return new Response(JSON.stringify({ success: true }), { headers });
         }
@@ -133,10 +149,6 @@ const server = Bun.serve({
             const proc = Bun.spawn(["bun", "run", "build"], { cwd: "../frontend" });
             return new Response(JSON.stringify({ status: "Build Triggered" }), { headers });
         }
-
-        // --- 静态文件托管 (可选，用于本地预览) ---
-        // 如果 Astro build 到了 ../frontend/dist
-        // ... 参考上一个回答的静态托管逻辑 ...
 
         return new Response("Not Found", { status: 404, headers });
     },
