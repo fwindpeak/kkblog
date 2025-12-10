@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { request } from './lib/api';
 import PostManager from './pages/PostManager.vue';
 import ThoughtManager from './pages/ThoughtManager.vue';
@@ -83,7 +83,7 @@ const switchView = (view: 'posts' | 'thoughts') => {
       <div class="p-4 border-t border-slate-100 bg-white">
         <button @click="handleBuild" :disabled="isBuilding"
           class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 disabled:opacity-50">
-          <IconRocket :class="['w-5 h-5', isBuilding ? 'animate-pulse' : '']" />
+          <IconRocket />
           {{ isBuilding ? '构建中...' : '发布网站' }}
         </button>
         <button @click="handleLogout" class="w-full mt-2 text-xs text-slate-400 hover:text-red-500 py-2">

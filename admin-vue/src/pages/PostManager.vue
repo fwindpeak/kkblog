@@ -142,7 +142,6 @@ const handleSave = async () => {
     }
 };
 
-const formatDate = (d?: string) => d ? new Date(d.replace(' ', 'T')).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit' }) : '';
 
 onMounted(loadPosts);
 </script>

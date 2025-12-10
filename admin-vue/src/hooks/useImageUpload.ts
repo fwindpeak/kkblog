@@ -85,8 +85,8 @@ export function useImageUpload() {
         e.preventDefault();
         const files = e.dataTransfer?.files;
         if (files && files.length > 0) {
-            const file = files[0];
-            if (file.type.startsWith('image/')) {
+            const file = files[0] || null;
+            if (file && file.type.startsWith('image/')) {
                 const url = await uploadFile(file);
                 if (url) {
                     insertAtCursor(textarea, `![](${url})`, updateModel);
