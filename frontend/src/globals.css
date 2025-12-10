@@ -5,24 +5,24 @@
   原来的 tailwind.config.js 可以删掉了，或者保留作为备用
 */
 @theme {
-    /* 1. 颜色配置 (对应原来的 colors.paper 和 colors.ink) */
-    --color-paper-50: #fdfbf7;
-    --color-paper-100: #f7f3e8;
-    --color-paper-200: #efe5d0;
-    --color-paper-300: #e5d3b0;
-    --color-paper-800: #5c4d3c;
-    --color-paper-900: #3e3429;
+  /* 1. 颜色配置 (对应原来的 colors.paper 和 colors.ink) */
+  --color-paper-50: #fdfbf7;
+  --color-paper-100: #f7f3e8;
+  --color-paper-200: #efe5d0;
+  --color-paper-300: #e5d3b0;
+  --color-paper-800: #5c4d3c;
+  --color-paper-900: #3e3429;
 
-    --color-ink-400: #5a6b8c;
-    --color-ink-500: #3b4d70;
-    --color-ink-900: #1a202c;
+  --color-ink-400: #5a6b8c;
+  --color-ink-500: #3b4d70;
+  --color-ink-900: #1a202c;
 
-    /* 2. 字体配置 */
-    --font-serif: "Noto Serif SC", serif;
-    --font-sans: "Nunito", sans-serif;
+  /* 2. 字体配置 */
+  --font-serif: sans-serif;
+  --font-sans: sans-serif;
 
-    /* 3. 阴影配置 */
-    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    --shadow-deep: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --shadow-inner-sm: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  /* 3. 阴影配置 */
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-deep: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-inner-sm: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
