@@ -130,7 +130,7 @@ const server = Bun.serve({
         if (method === "POST" && url.pathname === "/api/build") {
             // ... 保持原有构建逻辑 ...
             // 确保 cwd 指向你的 Astro 项目目录
-            const proc = Bun.spawn(["npm", "run", "build"], { cwd: "../frontend" });
+            const proc = Bun.spawn(["bun", "run", "build"], { cwd: "../frontend" });
             return new Response(JSON.stringify({ status: "Build Triggered" }), { headers });
         }
 
