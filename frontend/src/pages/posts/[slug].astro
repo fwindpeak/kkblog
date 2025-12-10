@@ -1,0 +1,42 @@
+---
+// src/pages/posts/[slug].astro
+import Layout from '../../layouts/Layout.astro';
+import { marked } from 'marked';
+
+// --- 1. 生成静态路径 ---
+// 这个函数必须存在，用于 SSG
+export async function getStaticPaths() {
+  // 请求后端获取所有文章
+  const response = await fetch('http://localhost:3000/api/posts');
+  const posts = await response.json();
+
+  // 返回一个数组，告诉 Astro 要生成哪些页面
+  // params 对应文件名中的 [slug]
+  // props 是传给页面组件的数据
+  return posts.map((post: any) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+// --- 2. 获取当前页面的数据 ---
+const { post } = Astro.props;
+
+// 解析 Markdown 为 HTML
+const contentHtml = await marked.parse(post.content);
+---
+
+<Layout title={post.title}>
+    <header style="margin-bottom: 40px;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">{post.title}</h1>
+        <div style="color: #666;">
+            <span>{new Date(post.created_at).toLocaleDateString()}</span>
+        </div>
+    </header>
+
+    <article class="prose" set:html={contentHtml} />
+    
+    <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee;">
+        <a href="/">&larr; 返回首页</a>
+    </div>
+</Layout>

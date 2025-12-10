@@ -1,223 +1,252 @@
-import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 
-// --- 1. 类型定义 (TypeScript Interfaces) ---
-
-// 文章数据结构
-interface PostData {
+// --- 类型定义 ---
+interface Post {
+  id?: number;
   slug: string;
   title: string;
   content: string;
+  created_at?: string;
 }
 
-// 通用 API 响应结构
-interface ApiResponse {
-  success?: boolean;
-  status?: string;
-  error?: string;
-}
-
-// --- 2. 简单的内联样式 (CSS in JS) ---
-const styles: Record<string, React.CSSProperties> = {
-  container: { maxWidth: '800px', margin: '40px auto', padding: '20px', fontFamily: 'system-ui, -apple-system, sans-serif' },
-  card: { border: '1px solid #e1e4e8', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', background: '#fff' },
-  input: { width: '100%', padding: '12px', marginBottom: '15px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '16px', boxSizing: 'border-box' },
-  textarea: { width: '100%', height: '400px', padding: '12px', marginBottom: '15px', border: '1px solid #d1d5db', borderRadius: '6px', fontFamily: 'monospace', fontSize: '14px', resize: 'vertical', boxSizing: 'border-box' },
-  button: { padding: '10px 20px', cursor: 'pointer', backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, fontSize: '14px' },
-  secondaryBtn: { padding: '10px 20px', cursor: 'pointer', backgroundColor: '#059669', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 600, fontSize: '14px', marginLeft: '10px' },
-  logoutBtn: { padding: '6px 12px', cursor: 'pointer', backgroundColor: '#dc2626', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '12px' },
-  label: { display: 'block', marginBottom: '6px', fontWeight: 600, color: '#374151' },
-  status: { marginLeft: '15px', fontSize: '14px', color: '#6b7280' }
-};
+// 视图模式枚举
+type ViewMode = 'LIST' | 'EDITOR';
 
 const API_URL = "http://localhost:3000";
 
+// --- 样式定义 (CSS-in-JS) ---
+const s = {
+  container: { maxWidth: '900px', margin: '40px auto', fontFamily: 'system-ui, sans-serif', color: '#333' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '15px' },
+  card: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' },
+  table: { width: '100%', borderCollapse: 'collapse' as const, marginTop: '10px' },
+  th: { textAlign: 'left' as const, padding: '12px', borderBottom: '2px solid #eee', color: '#666' },
+  td: { padding: '12px', borderBottom: '1px solid #eee' },
+  input: { width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px', boxSizing: 'border-box' as const },
+  textarea: { width: '100%', height: '400px', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px', fontFamily: 'monospace', boxSizing: 'border-box' as const },
+  btnPrimary: { background: '#2563eb', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 },
+  btnSuccess: { background: '#059669', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, marginRight: '10px' },
+  btnDanger: { background: '#dc2626', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', marginLeft: '8px' },
+  btnEdit: { background: '#4b5563', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' },
+  btnBack: { background: 'transparent', border: '1px solid #ccc', cursor: 'pointer', padding: '6px 12px', borderRadius: '6px', marginRight: '10px' },
+  status: { marginLeft: '10px', fontSize: '14px', color: '#666' }
+};
+
 function App() {
-  // --- State 管理 ---
-  const [token, setToken] = useState<string>(localStorage.getItem('admin_token') || '');
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [statusMsg, setStatusMsg] = useState<string>('');
+  // 全局状态
+  const [token, setToken] = useState(localStorage.getItem('admin_token') || '');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [view, setView] = useState<ViewMode>('LIST');
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState('');
 
-  // 表单数据 State
-  const [formData, setFormData] = useState<PostData>({
-    slug: '',
-    title: '',
-    content: ''
-  });
+  // 数据状态
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [editingPost, setEditingPost] = useState<Post>({ slug: '', title: '', content: '' });
 
-  // 初始化检查登录状态
+  // 登录检查
   useEffect(() => {
-    if (token) setIsLoggedIn(true);
+    if (token) {
+      setIsLoggedIn(true);
+      fetchPosts(); // 登录后立即获取列表
+    }
   }, [token]);
 
-  // --- 核心工具函数：带鉴权的 Fetch ---
-  // <T> 是泛型，表示我们期望返回的数据类型
-  async function request<T>(endpoint: string, method: 'GET' | 'POST' = 'POST', body?: object): Promise<T | null> {
+  // --- API 封装 ---
+  const request = async (url: string, method = 'GET', body?: any) => {
     setLoading(true);
-    setStatusMsg('处理中...');
-
+    setMsg('');
     try {
-      const res = await fetch(`${API_URL}${endpoint}`, {
+      const headers: any = { 'Content-Type': 'application/json' };
+      if (method !== 'GET') headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch(`${API_URL}${url}`, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 携带 Token
-        },
+        headers,
         body: body ? JSON.stringify(body) : null
       });
 
       if (res.status === 401) {
-        setStatusMsg('❌ 密钥已过期或错误，请重新登录');
-        handleLogout();
-        return null;
+        setToken('');
+        localStorage.removeItem('admin_token');
+        setIsLoggedIn(false);
+        throw new Error("鉴权失败");
       }
-
-      if (!res.ok) {
-        const errData = await res.json() as ApiResponse;
-        throw new Error(errData.error || `HTTP Error: ${res.status}`);
-      }
-
-      const data = await res.json();
-      return data as T;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '未知错误';
-      setStatusMsg(`❌ 错误: ${message}`);
+      return await res.json();
+    } catch (err: any) {
+      setMsg(`❌ ${err.message}`);
       return null;
     } finally {
       setLoading(false);
     }
-  }
-
-  // --- 事件处理 ---
-
-  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const inputToken = (form.elements.namedItem('secret') as HTMLInputElement).value;
-
-    if (inputToken) {
-      localStorage.setItem('admin_token', inputToken);
-      setToken(inputToken);
-      setIsLoggedIn(true);
-    }
   };
 
-  const handleLogout = () => {
-    setToken('');
-    localStorage.removeItem('admin_token');
-    setIsLoggedIn(false);
-    setStatusMsg('');
-  };
+  // --- 业务逻辑 ---
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const fetchPosts = async () => {
+    // 获取列表不需要鉴权（根据后端配置），但为了统一逻辑还是带着比较好
+    // 如果后端 GET /api/posts 没有鉴权，这里的 token 不会影响
+    const data = await request('/api/posts', 'GET');
+    if (data) setPosts(data);
   };
 
   const handleSave = async () => {
-    if (!formData.slug || !formData.title) {
-      alert("Slug 和 标题不能为空");
-      return;
-    }
+    if (!editingPost.slug || !editingPost.title) return alert("Slug 和 标题必填");
 
-    const res = await request<ApiResponse>('/api/post', 'POST', formData);
+    const res = await request('/api/post', 'POST', editingPost);
     if (res?.success) {
-      setStatusMsg('✅ 文章保存成功 (Draft)');
+      setMsg('✅ 保存成功');
+      await fetchPosts(); // 刷新列表
+      // 这里的逻辑可以改：保存后是留在编辑页还是返回列表？
+      // 目前选择：不跳转，方便继续编辑
+    }
+  };
+
+  const handleDelete = async (slug: string) => {
+    if (!confirm(`确定要删除文章 "${slug}" 吗？此操作不可恢复。`)) return;
+    const res = await request(`/api/post/${slug}`, 'DELETE');
+    if (res?.success) {
+      setMsg('🗑️ 已删除');
+      fetchPosts();
     }
   };
 
   const handleBuild = async () => {
-    const confirmBuild = window.confirm("确定要发布吗？这将触发服务器构建。");
-    if (!confirmBuild) return;
-
-    // 这里 request 期望返回 { status: string }
-    const res = await request<{ status: string }>('/api/build', 'POST');
-    if (res?.status) {
-      setStatusMsg('🎉 ' + res.status);
-    }
+    if (!confirm("确定要重新构建博客吗？")) return;
+    setMsg('⏳ 构建中...');
+    const res = await request('/api/build', 'POST');
+    if (res?.status) setMsg(`🎉 ${res.status}`);
   };
 
-  // --- 视图渲染 ---
+  // --- 视图切换逻辑 ---
 
-  // 1. 登录视图
+  const goToList = () => {
+    setView('LIST');
+    setMsg('');
+    fetchPosts(); // 每次回列表都刷新一下
+  };
+
+  const goToCreate = () => {
+    setEditingPost({ slug: '', title: '', content: '' }); // 重置表单
+    setView('EDITOR');
+    setMsg('');
+  };
+
+  const goToEdit = (post: Post) => {
+    setEditingPost({ ...post }); // 复制对象
+    setView('EDITOR');
+    setMsg('');
+  };
+
+  // --- 登录页 ---
   if (!isLoggedIn) {
     return (
-      <div style={{ ...styles.container, marginTop: '100px', textAlign: 'center' }}>
-        <div style={{ ...styles.card, maxWidth: '400px', margin: '0 auto' }}>
-          <h2 style={{ marginBottom: '20px' }}>🔐 Admin Login</h2>
-          <form onSubmit={handleLogin}>
-            <input
-              name="secret"
-              type="password"
-              placeholder="请输入 Server 密钥"
-              style={styles.input}
-              autoFocus
-            />
-            <button type="submit" style={{ ...styles.button, width: '100%' }}>进入后台</button>
+      <div style={{ ...s.container, textAlign: 'center', marginTop: '100px' }}>
+        <div style={{ ...s.card, maxWidth: '400px', margin: '0 auto' }}>
+          <h2>🔐 Admin Login</h2>
+          <form onSubmit={(e: any) => {
+            e.preventDefault();
+            const t = e.target.secret.value;
+            localStorage.setItem('admin_token', t);
+            setToken(t);
+          }}>
+            <input name="secret" type="password" placeholder="密钥" style={s.input} />
+            <button style={{ ...s.btnPrimary, width: '100%' }}>登录</button>
           </form>
         </div>
       </div>
     );
   }
 
-  // 2. 编辑器视图
+  // --- 主界面 ---
   return (
-    <div style={styles.container}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '24px', margin: 0 }}>📝 博客写作后台</h1>
-        <button onClick={handleLogout} style={styles.logoutBtn}>退出登录</button>
-      </header>
-
-      <div style={styles.card}>
+    <div style={s.container}>
+      {/* 顶部导航 */}
+      <div style={s.header}>
+        <h1 style={{ margin: 0 }}>📝 博客管理后台</h1>
         <div>
-          <label style={styles.label}>URL Slug (路径)</label>
-          <input
-            name="slug"
-            value={formData.slug}
-            onChange={handleInputChange}
-            placeholder="例如: my-first-blog"
-            style={styles.input}
-          />
+          <span style={{ marginRight: 10, fontSize: 12 }}>当前: {posts.length} 篇文章</span>
+          <button onClick={() => { setToken(''); setIsLoggedIn(false); }} style={s.btnBack}>退出</button>
         </div>
+      </div>
 
-        <div>
-          <label style={styles.label}>文章标题</label>
-          <input
-            name="title"
-            value={formData.title}
-            onChange={handleInputChange}
-            placeholder="输入文章标题..."
-            style={styles.input}
-          />
+      {/* 1. 列表视图 */}
+      {view === 'LIST' && (
+        <div style={s.card}>
+          <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
+            <button onClick={goToCreate} style={s.btnPrimary}>+ 新建文章</button>
+            <button onClick={handleBuild} style={{ ...s.btnSuccess, background: '#e11d48' }}>🚀 发布 (构建)</button>
+          </div>
+
+          {posts.length === 0 ? <p style={{ color: '#888', textAlign: 'center' }}>暂无文章</p> : (
+            <table style={s.table}>
+              <thead>
+                <tr>
+                  <th style={s.th}>标题</th>
+                  <th style={s.th}>Slug (路径)</th>
+                  <th style={s.th}>发布时间</th>
+                  <th style={s.th}>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {posts.map(post => (
+                  <tr key={post.slug}>
+                    <td style={s.td}><b>{post.title}</b></td>
+                    <td style={s.td}><code style={{ background: '#f3f4f6', padding: '2px 4px' }}>{post.slug}</code></td>
+                    <td style={s.td} style={{ fontSize: '13px', color: '#666' }}>{new Date(post.created_at || '').toLocaleDateString()}</td>
+                    <td style={s.td}>
+                      <button onClick={() => goToEdit(post)} style={s.btnEdit}>编辑</button>
+                      <button onClick={() => handleDelete(post.slug)} style={s.btnDanger}>删除</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <p style={{ textAlign: 'right', color: 'red' }}>{msg}</p>
         </div>
+      )}
 
-        <div>
-          <label style={styles.label}>正文内容 (Markdown)</label>
+      {/* 2. 编辑视图 */}
+      {view === 'EDITOR' && (
+        <div style={s.card}>
+          <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center' }}>
+            <button onClick={goToList} style={s.btnBack}>&larr; 返回列表</button>
+            <h2 style={{ margin: 0 }}>{editingPost.slug ? '编辑文章' : '新建文章'}</h2>
+          </div>
+
+          <label style={{ display: 'block', marginBottom: 5, fontWeight: 'bold' }}>Slug (URL路径):</label>
+          <input
+            value={editingPost.slug}
+            // 如果是编辑已有文章，通常不允许改 Slug (因为会变成新文章)，这里我们简单处理：允许改，改了就是新建/覆盖
+            onChange={e => setEditingPost({ ...editingPost, slug: e.target.value })}
+            placeholder="my-new-post"
+            style={s.input}
+          />
+
+          <label style={{ display: 'block', marginBottom: 5, fontWeight: 'bold' }}>文章标题:</label>
+          <input
+            value={editingPost.title}
+            onChange={e => setEditingPost({ ...editingPost, title: e.target.value })}
+            placeholder="输入标题"
+            style={s.input}
+          />
+
+          <label style={{ display: 'block', marginBottom: 5, fontWeight: 'bold' }}>内容 (Markdown):</label>
           <textarea
-            name="content"
-            value={formData.content}
-            onChange={handleInputChange}
-            placeholder="# Hello World..."
-            style={styles.textarea}
+            value={editingPost.content}
+            onChange={e => setEditingPost({ ...editingPost, content: e.target.value })}
+            style={s.textarea}
           />
+
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <button onClick={handleSave} disabled={loading} style={s.btnPrimary}>
+              {loading ? '保存中...' : '💾 保存'}
+            </button>
+            <span style={s.status}>{msg}</span>
+          </div>
         </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-          <button onClick={handleSave} disabled={loading} style={{ ...styles.button, opacity: loading ? 0.7 : 1 }}>
-            {loading ? '...' : '💾 保存草稿'}
-          </button>
-
-          <button onClick={handleBuild} disabled={loading} style={{ ...styles.secondaryBtn, opacity: loading ? 0.7 : 1 }}>
-            🚀 发布并构建
-          </button>
-
-          <span style={styles.status}>{statusMsg}</span>
-        </div>
-      </div>
-
-      <div style={{ marginTop: '20px', color: '#6b7280', fontSize: '13px', textAlign: 'center' }}>
-        Powered by Bun + React + TypeScript
-      </div>
+      )}
     </div>
   );
 }
