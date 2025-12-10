@@ -1,8 +1,10 @@
 // server.ts
 import { Database } from "bun:sqlite";
+import { join } from "path"; // 引入 path 模块
 
 const ADMIN_SECRET = Bun.env.ADMIN_SECRET || "123456";
 const FRONTEND_DIR = "../frontend";
+const UPLOAD_DIR = "./uploads"; // 确保 uploads 目录存在
 
 const db = new Database("blog.db");
 // 确保表结构存在
@@ -15,6 +17,7 @@ db.run(`
     content TEXT,
     excerpt TEXT,
     tags TEXT,
+    read_time TEXT, 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
@@ -30,6 +33,8 @@ db.run(`
 
 const server = Bun.serve({
     port: 3000,
+    // 增大最大请求体大小 (默认较小，传图片可能不够)
+    maxRequestBodySize: 1024 * 1024 * 50, // 50MB
     async fetch(req) {
         const url = new URL(req.url);
         const method = req.method;
@@ -50,6 +55,54 @@ const server = Bun.serve({
             const authHeader = req.headers.get("Authorization");
             if (!authHeader || authHeader !== `Bearer ${ADMIN_SECRET}`) {
                 return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers });
+            }
+        }
+
+        // --- 静态文件服务 (图片访问) ---
+        // 访问 http://localhost:3000/uploads/xxx.jpg
+        if (method === "GET" && url.pathname.startsWith("/api/uploads/")) {
+            const fileName = url.pathname.replace("/api/uploads/", "");
+            const filePath = join(UPLOAD_DIR, fileName);
+            console.log(filePath);
+            const file = Bun.file(filePath);
+            if (await file.exists()) {
+                return new Response(file);
+            }
+            return new Response("File not found", { status: 404 });
+        }
+
+        // --- API: 图片上传 ---
+        if (method === "POST" && url.pathname === "/api/upload") {
+            try {
+                // 鉴权
+                const authHeader = req.headers.get("Authorization");
+                if (!authHeader || authHeader !== `Bearer ${ADMIN_SECRET}`) {
+                    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers });
+                }
+
+                const formData = await req.formData();
+                const file = formData.get('file');
+
+                if (!file || !(file instanceof Blob)) {
+                    return new Response(JSON.stringify({ error: "No file uploaded" }), { status: 400, headers });
+                }
+
+                // 生成唯一文件名: timestamp-filename
+                const fileName = `${Date.now()}-${file.name}`;
+                const filePath = join(UPLOAD_DIR, fileName);
+
+                // 写入文件
+                await Bun.write(filePath, file);
+
+                // 返回完整的访问 URL
+                // 注意：如果你部署到线上，这里要改成你的域名
+                const fileUrl = `http://localhost:3000/api/uploads/${fileName}`;
+
+                return new Response(JSON.stringify({ success: true, url: fileUrl }), { headers: { ...headers, "Content-Type": "application/json" } });
+
+            } catch (e) {
+                console.error(e);
+                return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers });
             }
         }
 
@@ -77,18 +130,32 @@ const server = Bun.serve({
         if (method === "POST" && url.pathname === "/api/post") {
             try {
                 const body = await req.json();
-                const { slug, title, content, tags } = body;
+                // 🟢 获取 read_time
+                const { slug, title, content, tags, read_time } = body;
 
-                // 自动生成 excerpt (摘要)
                 const plainText = content.replace(/[#*`!\[\]\(\)]/g, '').substring(0, 100) + '...';
                 const tagsStr = JSON.stringify(tags || []);
 
+                // 🟢 SQL 增加 read_time 字段
                 const query = db.query(`
-          INSERT INTO posts (slug, title, content, excerpt, tags, created_at) 
-          VALUES ($slug, $title, $content, $excerpt, $tagsStr, datetime('now', '+08:00'))
-          ON CONFLICT(slug) DO UPDATE SET title=$title, content=$content, excerpt=$excerpt, tags=$tagsStr
+          INSERT INTO posts (slug, title, content, excerpt, tags, read_time, created_at) 
+          VALUES ($slug, $title, $content, $excerpt, $tagsStr, $read_time, datetime('now', '+08:00'))
+          ON CONFLICT(slug) DO UPDATE SET 
+            title=$title, 
+            content=$content, 
+            excerpt=$excerpt, 
+            tags=$tagsStr, 
+            read_time=$read_time
         `);
-                query.run({ $slug: slug, $title: title, $content: content, $excerpt: plainText, $tagsStr: tagsStr });
+
+                query.run({
+                    $slug: slug,
+                    $title: title,
+                    $content: content,
+                    $excerpt: plainText,
+                    $tagsStr: tagsStr,
+                    $read_time: read_time || '1' // 默认值
+                });
                 return new Response(JSON.stringify({ success: true }), { headers });
             } catch (e) {
                 return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers });
@@ -146,7 +213,7 @@ const server = Bun.serve({
         if (method === "POST" && url.pathname === "/api/build") {
             // ... 保持原有构建逻辑 ...
             // 确保 cwd 指向你的 Astro 项目目录
-            const proc = Bun.spawn(["bun", "run", "build"], { cwd: "../frontend" });
+            const proc = Bun.spawn(["bun", "run", "build"], { cwd: FRONTEND_DIR });
             return new Response(JSON.stringify({ status: "Build Triggered" }), { headers });
         }
 
