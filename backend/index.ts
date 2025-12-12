@@ -52,7 +52,7 @@ const server = Bun.serve({
 
         // 鉴权 (GET 请求不需要鉴权，方便构建，但为了安全你也可以给 GET /api/posts 加鉴权，
         // 然后构建脚本里也传 token。这里为了简单，GET 设为公开，写操作鉴权)
-        if (method !== "GET") {
+        if (method !== "GET" && !url.pathname.startsWith("/api/auth")) {
             const authHeader = req.headers.get("Authorization");
             if (!authHeader || authHeader !== `Bearer ${ADMIN_SECRET}`) {
                 return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers });
@@ -84,7 +84,7 @@ const server = Bun.serve({
                 const formData = await req.formData();
                 const file = formData.get('file');
 
-                if (!file || !(file instanceof Blob)) {
+                if (!file || !(file instanceof File)) {
                     return new Response(JSON.stringify({ error: "No file uploaded" }), { status: 400, headers });
                 }
 
@@ -121,7 +121,7 @@ const server = Bun.serve({
 
         if (method === "GET" && url.pathname.startsWith("/api/post/")) {
             const slug = url.pathname.split("/").pop();
-            const post = db.query("SELECT * FROM posts WHERE slug = $slug").get({ $slug: slug });
+            const post = slug ? db.query("SELECT * FROM posts WHERE slug = $slug").get({ $slug: slug }) : null;
             if (post) {
                 return new Response(JSON.stringify(post), { headers });
             }
@@ -130,7 +130,7 @@ const server = Bun.serve({
 
         if (method === "POST" && url.pathname === "/api/post") {
             try {
-                const body = await req.json();
+                const body = await req.json() as { slug: string; title: string; content: string; tags: string[]; read_time?: string };
                 // 🟢 获取 read_time
                 const { slug, title, content, tags, read_time } = body;
 
@@ -165,7 +165,9 @@ const server = Bun.serve({
 
         if (method === "DELETE" && url.pathname.startsWith("/api/post/")) {
             const slug = url.pathname.split("/").pop();
-            db.query("DELETE FROM posts WHERE slug = $slug").run({ $slug: slug });
+            if (slug) {
+                db.query("DELETE FROM posts WHERE slug = $slug").run({ $slug: slug });
+            }
             return new Response(JSON.stringify({ success: true }), { headers });
         }
 
@@ -206,8 +208,25 @@ const server = Bun.serve({
 
         if (method === "DELETE" && url.pathname.startsWith("/api/thought/")) {
             const id = url.pathname.split("/").pop(); // 🟢 确保 ID 是数字
-            db.query("DELETE FROM thoughts WHERE id = $id").run({ $id: id });
+            if (id) {
+                db.query("DELETE FROM thoughts WHERE id = $id").run({ $id: parseInt(id) });
+            }
             return new Response(JSON.stringify({ success: true }), { headers });
+        }
+
+        // --- API: 密码验证 ---
+        if (method === "POST" && url.pathname === "/api/auth/verify") {
+            try {
+                const body = await req.json() as { secret: string };
+                const { secret } = body;
+                if (secret === ADMIN_SECRET) {
+                    return new Response(JSON.stringify({ success: true }), { headers });
+                } else {
+                    return new Response(JSON.stringify({ error: "密码错误" }), { status: 401, headers });
+                }
+            } catch (e) {
+                return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers });
+            }
         }
 
         // --- 构建触发器 ---

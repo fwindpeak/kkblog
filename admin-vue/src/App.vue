@@ -12,9 +12,20 @@ const isMobileMenuOpen = ref(false); // 控制手机端菜单
 
 const secretInput = ref('');
 
-const handleLogin = () => {
-  localStorage.setItem('admin_token', secretInput.value);
-  token.value = secretInput.value;
+const handleLogin = async () => {
+  try {
+    const res = await request<{ success: boolean }>('/api/auth/verify', 'POST', { secret: secretInput.value });
+    if (res?.success) {
+      localStorage.setItem('admin_token', secretInput.value);
+      token.value = secretInput.value;
+    }
+    // else {
+    //   alert('密码错误');
+    // }
+  } catch (error) {
+    console.error('登录失败:', error);
+    alert('登录失败，请稍后重试');
+  }
 };
 
 const handleLogout = () => {
