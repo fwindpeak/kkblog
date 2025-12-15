@@ -1,9 +1,20 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, provide, onMounted } from 'vue';
 import { request } from './lib/api';
 import PostManager from './pages/PostManager.vue';
 import ThoughtManager from './pages/ThoughtManager.vue';
+import ConfirmDialog from './components/ConfirmDialog.vue';
+import AlertDialog from './components/AlertDialog.vue';
 import { IconBook, IconChatBubble, IconRocket, IconMenu, IconX } from './components/Icons';
+import { useDialog } from './hooks/useDialog';
+
+// 提供全局对话框功能
+const dialog = useDialog();
+provide('dialog', dialog);
+
+// 设置API请求使用的对话框实例
+import { setDialog } from './lib/api';
+setDialog(dialog);
 
 const token = ref(localStorage.getItem('admin_token') || '');
 const currentView = ref<'posts' | 'thoughts'>('posts');
@@ -18,13 +29,20 @@ const handleLogin = async () => {
     if (res?.success) {
       localStorage.setItem('admin_token', secretInput.value);
       token.value = secretInput.value;
+    } else {
+      await dialog.alert({
+        message: '密码错误',
+        type: 'error',
+        title: '登录失败'
+      });
     }
-    // else {
-    //   alert('密码错误');
-    // }
   } catch (error) {
     console.error('登录失败:', error);
-    alert('登录失败，请稍后重试');
+    await dialog.alert({
+      message: '登录失败，请稍后重试',
+      type: 'error',
+      title: '登录失败'
+    });
   }
 };
 
@@ -35,10 +53,19 @@ const handleLogout = () => {
 };
 
 const handleBuild = async () => {
-  if (!confirm("确定要发布并构建静态网站吗？")) return;
+  const confirmed = await dialog.confirm({
+    message: "确定要发布并构建静态网站吗？",
+    title: "发布确认"
+  });
+  if (!confirmed) return;
+
   isBuilding.value = true;
   const res = await request<{ status: string }>('/api/build', 'POST');
-  alert(res?.status || "构建指令已发送");
+  await dialog.alert({
+    message: res?.status || "构建指令已发送",
+    type: 'info',
+    title: '构建状态'
+  });
   isBuilding.value = false;
   isMobileMenuOpen.value = false;
 };
@@ -47,9 +74,23 @@ const switchView = (view: 'posts' | 'thoughts') => {
   currentView.value = view;
   isMobileMenuOpen.value = false; // 手机端切换后自动关闭菜单
 };
+
+onMounted(() => {
+  // 测试对话框是否正常工作
+  // dialog.isConfirmOpen.value = true;
+})
 </script>
 
 <template>
+  <!-- Dialog Components -->
+  <ConfirmDialog v-model:isOpen="dialog.isConfirmOpen.value" :title="dialog.confirmOptions.value.title"
+    :message="dialog.confirmOptions.value.message" :confirm-text="dialog.confirmOptions.value.confirmText"
+    :cancel-text="dialog.confirmOptions.value.cancelText" @close="dialog.handleConfirmClose" />
+
+  <AlertDialog v-model:isOpen="dialog.isAlertOpen.value" :title="dialog.alertOptions.value.title"
+    :message="dialog.alertOptions.value.message" :confirm-text="dialog.alertOptions.value.confirmText"
+    :type="dialog.alertOptions.value.type" @close="dialog.handleAlertClose" />
+
   <div v-if="!token" class="flex items-center justify-center h-screen bg-slate-100 px-4">
     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm">
       <h2 class="text-2xl font-bold mb-6 text-center">Admin Login</h2>

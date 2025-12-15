@@ -1,9 +1,10 @@
 // src/hooks/useImageUpload.ts
 import { ref } from 'vue';
+import type { UseDialogType } from './useDialog';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
-export function useImageUpload() {
+export function useImageUpload(dialog?: UseDialogType) {
     const isUploading = ref(false);
 
     // 上传核心方法
@@ -25,11 +26,27 @@ export function useImageUpload() {
             if (data.success) {
                 return data.url;
             } else {
-                alert("上传失败: " + data.error);
+                if (dialog) {
+                    await dialog.alert({
+                        message: "上传失败: " + data.error,
+                        type: 'error',
+                        title: '上传失败'
+                    });
+                } else {
+                    alert("上传失败: " + data.error);
+                }
                 return null;
             }
         } catch (e) {
-            alert("上传出错");
+            if (dialog) {
+                await dialog.alert({
+                    message: "上传出错",
+                    type: 'error',
+                    title: '上传失败'
+                });
+            } else {
+                alert("上传出错");
+            }
             return null;
         } finally {
             isUploading.value = false;

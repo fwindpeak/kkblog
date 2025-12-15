@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import { request } from '../lib/api';
+import { useDialog } from '../hooks/useDialog';
+type UseDialogType = ReturnType<typeof useDialog>;
+
+// 注入全局对话框功能
+const dialog = inject<UseDialogType>('dialog');
+if (!dialog) {
+    throw new Error('Dialog service not provided');
+}
 
 import { useImageUpload } from '../hooks/useImageUpload';
 import { IconTrash, IconPen, IconImage } from '../components/Icons';
@@ -18,7 +26,7 @@ const content = ref('');
 const textareaRef = ref<HTMLTextAreaElement | null>(null); // 获取 textarea 实例
 const fileInputRef = ref<HTMLInputElement | null>(null);   // 获取 file input 实例
 // Hook
-const { isUploading, uploadFile, handlePaste, handleDrop, insertAtCursor } = useImageUpload();
+const { isUploading, uploadFile, handlePaste, handleDrop, insertAtCursor } = useImageUpload(dialog);
 
 const mood = ref('happy');
 // 🟢 新增编辑状态
@@ -106,7 +114,11 @@ const onDrop = (e: DragEvent) => {
 };
 
 const handleDelete = async (id: number) => {
-    if (!confirm('删除?')) return;
+    const confirmed = await dialog.confirm({
+        message: '删除?',
+        title: '删除确认'
+    });
+    if (!confirmed) return;
     await request(`/api/thought/${id}`, 'DELETE');
     // 如果正在编辑的被删了，也要重置
     if (editingId.value === id) cancelEdit();

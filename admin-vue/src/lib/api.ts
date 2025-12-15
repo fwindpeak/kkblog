@@ -1,5 +1,17 @@
 // src/lib/api.ts
+import type { UseDialogType } from '../hooks/useDialog';
+
+
+
 const API_URL = import.meta.env.VITE_SERVER_URL || "";
+
+// Global dialog instance
+let dialogInstance: UseDialogType | null = null;
+
+// Set dialog instance for use in API requests
+export function setDialog(dialog: UseDialogType) {
+    dialogInstance = dialog;
+}
 
 export const request = async <T>(
     endpoint: string,
@@ -23,7 +35,15 @@ export const request = async <T>(
         });
 
         if (res.status === 401) {
-            alert("登录过期或密钥错误");
+            if (dialogInstance) {
+                await dialogInstance.alert({
+                    message: "登录过期或密钥错误",
+                    type: 'error',
+                    title: '认证失败'
+                });
+            } else {
+                alert("登录过期或密钥错误");
+            }
             localStorage.removeItem('admin_token');
             window.location.reload();
             return null;
@@ -37,7 +57,15 @@ export const request = async <T>(
         return await res.json();
     } catch (e: any) {
         console.error(e);
-        alert(e.message);
+        if (dialogInstance) {
+            await dialogInstance.alert({
+                message: e.message,
+                type: 'error',
+                title: '请求失败'
+            });
+        } else {
+            alert(e.message);
+        }
         return null;
     }
 };

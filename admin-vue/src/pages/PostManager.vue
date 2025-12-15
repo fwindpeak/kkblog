@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from 'vue';
+import { ref, onMounted, reactive, computed, inject } from 'vue';
 import { request } from '../lib/api';
 import { IconPen, IconTrash, IconImage } from '../components/Icons';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { marked } from 'marked';
+import { useDialog } from '../hooks/useDialog';
+type UseDialogType = ReturnType<typeof useDialog>;
+
+// 注入全局对话框功能
+const dialog = inject<UseDialogType>('dialog');
+if (!dialog) {
+    throw new Error('Dialog service not provided');
+}
 
 interface Post {
     slug: string;
@@ -34,7 +42,7 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
 // Hook
-const { isUploading, uploadFile, handlePaste, handleDrop, insertAtCursor } = useImageUpload();
+const { isUploading, uploadFile, handlePaste, handleDrop, insertAtCursor } = useImageUpload(dialog);
 
 // 🟢 按钮选择文件
 const onFileSelect = async (e: Event) => {
@@ -99,7 +107,11 @@ const handleCreate = () => {
 };
 
 const handleDelete = async (slug: string) => {
-    if (!confirm('确定删除?')) return;
+    const confirmed = await dialog.confirm({
+        message: '确定删除?',
+        title: '删除确认'
+    });
+    if (!confirmed) return;
     await request(`/api/post/${slug}`, 'DELETE');
     loadPosts();
 };
