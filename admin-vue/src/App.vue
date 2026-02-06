@@ -3,6 +3,7 @@ import { ref, provide, onMounted } from 'vue';
 import { request } from './lib/api';
 import PostManager from './pages/PostManager.vue';
 import ThoughtManager from './pages/ThoughtManager.vue';
+import CommentManager from './pages/CommentManager.vue';
 import ConfirmDialog from './components/ConfirmDialog.vue';
 import AlertDialog from './components/AlertDialog.vue';
 import { IconBook, IconChatBubble, IconRocket, IconMenu, IconX } from './components/Icons';
@@ -17,7 +18,7 @@ import { setDialog } from './lib/api';
 setDialog(dialog);
 
 const token = ref(localStorage.getItem('admin_token') || '');
-const currentView = ref<'posts' | 'thoughts'>('posts');
+const currentView = ref<'posts' | 'thoughts' | 'comments'>('posts');
 const isBuilding = ref(false);
 const isMobileMenuOpen = ref(false); // 控制手机端菜单
 
@@ -70,7 +71,7 @@ const handleBuild = async () => {
   isMobileMenuOpen.value = false;
 };
 
-const switchView = (view: 'posts' | 'thoughts') => {
+const switchView = (view: 'posts' | 'thoughts' | 'comments') => {
   currentView.value = view;
   isMobileMenuOpen.value = false; // 手机端切换后自动关闭菜单
 };
@@ -130,6 +131,10 @@ onMounted(() => {
           :class="['w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors', currentView === 'thoughts' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-500 hover:bg-slate-50']">
           <IconChatBubble class="w-5 h-5" /> 随笔记录
         </button>
+        <button @click="switchView('comments')"
+          :class="['w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors', currentView === 'comments' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-500 hover:bg-slate-50']">
+          <IconChatBubble class="w-5 h-5" /> 评论管理
+        </button>
       </nav>
 
       <div class="p-4 border-t border-slate-100 bg-white">
@@ -151,6 +156,7 @@ onMounted(() => {
       <div class="h-full max-w-5xl mx-auto overflow-y-auto pb-20 md:pb-0">
         <PostManager v-if="currentView === 'posts'" />
         <ThoughtManager v-if="currentView === 'thoughts'" />
+        <CommentManager v-if="currentView === 'comments'" />
       </div>
     </main>
   </div>

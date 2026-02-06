@@ -1,0 +1,115 @@
+---
+// src/components/Comments.astro
+interface Props {
+  id: string | number;
+  type: 'post' | 'thought';
+}
+
+const { id, type } = Astro.props;
+---
+
+<div class="comments-section mt-12 pt-8 border-t border-gray-100">
+  <h3 class="text-xl font-bold mb-6">评论</h3>
+  
+  <!-- 评论列表 -->
+  <div id="comments-list" class="space-y-6 mb-8" data-id={id} data-type={type}>
+    <p class="text-gray-400 italic">正在加载评论...</p>
+  </div>
+
+  <!-- 评论表单 -->
+  <div class="comment-form bg-gray-50 p-6 rounded-xl">
+    <h4 class="text-lg font-medium mb-4">发表评论</h4>
+    <div class="space-y-4">
+      <input 
+        type="text" 
+        id="comment-author" 
+        placeholder="你的昵称" 
+        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <textarea 
+        id="comment-content" 
+        rows="3" 
+        placeholder="说点什么吧..." 
+        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      ></textarea>
+      <button 
+        id="submit-comment" 
+        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+      >
+        提交评论
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const list = document.getElementById('comments-list');
+  const authorInput = document.getElementById('comment-author') as HTMLInputElement;
+  const contentInput = document.getElementById('comment-content') as HTMLTextAreaElement;
+  const submitBtn = document.getElementById('submit-comment');
+  const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+
+  if (list) {
+    const id = list.getAttribute('data-id');
+    const type = list.getAttribute('data-type');
+
+    async function loadComments() {
+      try {
+        const res = await fetch(`${serverUrl}/api/comments?id=${id}&type=${type}`);
+        const comments = await res.json();
+        
+        if (comments.length === 0) {
+          list.innerHTML = '<p class="text-gray-400 italic">暂无评论，快来抢沙发吧！</p>';
+          return;
+        }
+
+        list.innerHTML = comments.map((c: any) => `
+          <div class="comment-item">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-gray-800">${c.author}</span>
+              <span class="text-xs text-gray-400">${new Date(c.created_at).toLocaleString()}</span>
+            </div>
+            <p class="text-gray-600">${c.content}</p>
+          </div>
+        `).join('');
+      } catch (e) {
+        list.innerHTML = '<p class="text-red-400">加载评论失败</p>';
+      }
+    }
+
+    loadComments();
+
+    if (submitBtn) {
+      submitBtn.addEventListener('click', async () => {
+        const author = authorInput.value.trim() || '匿名';
+        const content = contentInput.value.trim();
+
+        if (!content) {
+          alert('请输入评论内容');
+          return;
+        }
+
+        submitBtn.setAttribute('disabled', 'true');
+        submitBtn.innerText = '提交中...';
+
+        try {
+          const res = await fetch(`${serverUrl}/api/comment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, id, author, content })
+          });
+
+          if (res.ok) {
+            contentInput.value = '';
+            loadComments();
+          }
+        } catch (e) {
+          alert('提交失败');
+        } finally {
+          submitBtn.removeAttribute('disabled');
+          submitBtn.innerText = '提交评论';
+        }
+      });
+    }
+  }
+</script>

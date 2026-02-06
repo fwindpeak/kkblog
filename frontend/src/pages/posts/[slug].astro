@@ -2,6 +2,8 @@
 // src/pages/posts/[slug].astro
 import Layout from '../../layouts/Layout.astro';
 import { marked } from 'marked';
+import LikeButton from '../../components/LikeButton.astro';
+import Comments from '../../components/Comments.astro';
 
 // --- 1. 生成静态路径 ---
 // 这个函数必须存在，用于 SSG
@@ -35,6 +37,10 @@ const contentHtml = await marked.parse(post.content);
     </header>
 
     <article class="prose" set:html={contentHtml} />
+    
+    <LikeButton id={post.slug} type="post" initialLikes={post.likes} />
+    
+    <Comments id={post.slug} type="post" />
     
     <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee;">
         <a href="/">&larr; 返回首页</a>

@@ -27,9 +27,25 @@ db.run(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     content TEXT,
     mood TEXT,
+    likes INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
+
+db.run(`
+  CREATE TABLE IF NOT EXISTS comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    target_id TEXT,
+    target_type TEXT,
+    author TEXT,
+    content TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
+// 迁移：为旧表增加 likes 字段
+try { db.run("ALTER TABLE posts ADD COLUMN likes INTEGER DEFAULT 0"); } catch (e) { }
+try { db.run("ALTER TABLE thoughts ADD COLUMN likes INTEGER DEFAULT 0"); } catch (e) { }
 
 const server = Bun.serve({
     hostname: Bun.env.SERVER_HOST || "0.0.0.0",
@@ -235,6 +251,58 @@ const server = Bun.serve({
             // 确保 cwd 指向你的 Astro 项目目录
             const proc = Bun.spawn(["bun", "run", "build"], { cwd: FRONTEND_DIR });
             return new Response(JSON.stringify({ status: "Build Triggered" }), { headers });
+        }
+
+        // --- API: Likes (点赞) ---
+        if (method === "POST" && url.pathname === "/api/like") {
+            try {
+                const body = await req.json() as { type: 'post' | 'thought', id: string | number };
+                const { type, id } = body;
+                if (type === 'post') {
+                    db.query("UPDATE posts SET likes = likes + 1 WHERE slug = $id").run({ $id: id });
+                } else {
+                    db.query("UPDATE thoughts SET likes = likes + 1 WHERE id = $id").run({ $id: id });
+                }
+                return new Response(JSON.stringify({ success: true }), { headers });
+            } catch (e) {
+                return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers });
+            }
+        }
+
+        // --- API: Comments (评论) ---
+        if (method === "GET" && url.pathname === "/api/all-comments") {
+            const comments = db.query("SELECT * FROM comments ORDER BY created_at DESC").all();
+            return new Response(JSON.stringify(comments), { headers });
+        }
+
+        if (method === "GET" && url.pathname === "/api/comments") {
+            const target_id = url.searchParams.get("id");
+            const target_type = url.searchParams.get("type");
+            const comments = db.query("SELECT * FROM comments WHERE target_id = $id AND target_type = $type ORDER BY created_at ASC")
+                .all({ $id: target_id, $type: target_type });
+            return new Response(JSON.stringify(comments), { headers });
+        }
+
+        if (method === "POST" && url.pathname === "/api/comment") {
+            try {
+                const body = await req.json() as { type: string, id: string, author: string, content: string };
+                const { type, id, author, content } = body;
+                db.query(`
+                    INSERT INTO comments (target_id, target_type, author, content, created_at) 
+                    VALUES ($id, $type, $author, $content, datetime('now', '+08:00'))
+                `).run({ $id: id, $type: type, $author: author || '匿名', $content: content });
+                return new Response(JSON.stringify({ success: true }), { headers });
+            } catch (e) {
+                return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers });
+            }
+        }
+
+        if (method === "DELETE" && url.pathname.startsWith("/api/comment/")) {
+            const id = url.pathname.split("/").pop();
+            if (id) {
+                db.query("DELETE FROM comments WHERE id = $id").run({ $id: parseInt(id) });
+            }
+            return new Response(JSON.stringify({ success: true }), { headers });
         }
 
         return new Response("Not Found", { status: 404, headers });

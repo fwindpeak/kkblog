@@ -18,6 +18,7 @@ interface Thought {
     id?: number;
     content: string;
     mood: string;
+    likes?: number;
     created_at?: string;
 }
 
@@ -188,12 +189,18 @@ onMounted(loadThoughts);
 
                     </div>
 
-                    <div class="flex items-center gap-2 text-xs text-slate-400 font-mono">
-                        <span>{{ formatDate(thought.created_at) }}</span>
-                        <span class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-500">
-                            {{ moodMap[thought.mood]?.split(' ')[0] }}
-                        </span>
-                        <span v-if="editingId === thought.id" class="text-blue-500 font-bold ml-2">正在编辑...</span>
+                    <div class="flex items-center gap-4 text-xs text-slate-400 font-mono">
+                        <div class="flex items-center gap-1">
+                            <span>{{ formatDate(thought.created_at) }}</span>
+                            <span class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-500">
+                                {{ moodMap[thought.mood]?.split(' ')[0] }}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-1 text-pink-400">
+                            <span>❤️</span>
+                            <span>{{ thought.likes || 0 }}</span>
+                        </div>
+                        <span v-if="editingId === thought.id" class="text-blue-500 font-bold">正在编辑...</span>
                     </div>
                 </div>
             </div>

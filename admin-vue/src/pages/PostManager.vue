@@ -19,6 +19,7 @@ interface Post {
     content: string;
     tags: string[];
     read_time?: string;
+    likes?: number;
     created_at?: string;
 }
 // 🟢 Tab 状态
@@ -288,7 +289,12 @@ onMounted(loadPosts);
                                 <div class="font-bold text-slate-800">{{ post.title }}</div>
                                 <div class="text-xs text-slate-400 font-mono mt-1">{{ post.slug }}</div>
                             </td>
-                            <td class="p-4 text-slate-500">{{ new Date(post.created_at || '').toLocaleDateString() }}
+                            <td class="p-4 text-slate-500">
+                                <div class="text-xs">{{ new Date(post.created_at || '').toLocaleDateString() }}</div>
+                                <div class="mt-1 flex items-center gap-1 text-pink-500">
+                                    <span>❤️</span>
+                                    <span>{{ post.likes || 0 }}</span>
+                                </div>
                             </td>
                             <td class="p-4 text-right space-x-2">
                                 <button @click="handleEdit(post)" class="text-blue-600 p-1">

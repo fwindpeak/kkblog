@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { marked } from 'marked';
+import LikeButton from '../components/LikeButton.astro';
 
 const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/thoughts`);
 const thoughts = await response.json();
@@ -42,6 +43,10 @@ const moodMap: Record<string, string> = {
                                 </span>
                             )}
                         </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <LikeButton id={thought.id} type="thought" initialLikes={thought.likes} />
                     </div>
                 </div>
             ))}

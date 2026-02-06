@@ -1,0 +1,50 @@
+---
+// src/components/LikeButton.astro
+interface Props {
+  id: string | number;
+  type: 'post' | 'thought';
+  initialLikes?: number;
+}
+
+const { id, type, initialLikes = 0 } = Astro.props;
+---
+
+<div class="like-container flex items-center gap-2 mt-4">
+  <button 
+    class="like-btn flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-pink-100 hover:text-pink-600 transition-colors cursor-pointer text-sm"
+    data-id={id} 
+    data-type={type}
+  >
+    <span class="heart-icon">❤️</span>
+    <span class="like-count">{initialLikes}</span>
+  </button>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.like-btn');
+  const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const type = btn.getAttribute('data-type');
+      const countSpan = btn.querySelector('.like-count');
+      
+      try {
+        const res = await fetch(`${serverUrl}/api/like`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, id })
+        });
+        
+        if (res.ok && countSpan) {
+          const current = parseInt(countSpan.textContent || '0');
+          countSpan.textContent = (current + 1).toString();
+          btn.classList.add('text-pink-600', 'bg-pink-50');
+        }
+      } catch (e) {
+        console.error('Like failed:', e);
+      }
+    });
+  });
+</script>
