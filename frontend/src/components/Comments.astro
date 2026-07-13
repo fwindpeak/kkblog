@@ -47,7 +47,7 @@ const { id, type } = Astro.props;
   const authorInput = document.getElementById('comment-author') as HTMLInputElement;
   const contentInput = document.getElementById('comment-content') as HTMLTextAreaElement;
   const submitBtn = document.getElementById('submit-comment');
-  const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+  const serverUrl = import.meta.env.PUBLIC_SERVER_URL || 'http://localhost:3000';
 
   if (list) {
     const id = list.getAttribute('data-id');
