@@ -1,0 +1,19 @@
+---
+import App from '../admin/App.vue';
+import '../globals.css';
+
+// Mount admin Vue SPA dashboard
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>系统管理后台</title>
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <App client:only="vue" />
+  </body>
+</html>
