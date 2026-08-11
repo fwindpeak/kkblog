@@ -75,6 +75,16 @@ db.run(`
   )
 `);
 
+db.run(`
+  CREATE TABLE IF NOT EXISTS page_views (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    path TEXT,
+    ip TEXT,
+    user_agent TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
 // Migrations
 try { db.run("ALTER TABLE posts ADD COLUMN likes INTEGER DEFAULT 0"); } catch (e) { }
 try { db.run("ALTER TABLE thoughts ADD COLUMN likes INTEGER DEFAULT 0"); } catch (e) { }

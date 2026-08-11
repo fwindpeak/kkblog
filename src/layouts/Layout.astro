@@ -107,6 +107,17 @@ const isActive = (path: string) => {
                         iconClose.classList.toggle('inline-flex');
                     });
                 }
+
+                // Page view tracking
+                try {
+                    fetch('/api/track', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ path: window.location.pathname })
+                    });
+                } catch (e) {
+                    console.error('Tracking failed', e);
+                }
             });
         </script>
 	</body>
