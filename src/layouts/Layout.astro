@@ -1,9 +1,5 @@
 ---
 import '../globals.css'
-import IconHome from '../components/icons/IconHome.astro';
-import IconBook from '../components/icons/IconBook.astro';
-import IconChatBubble from '../components/icons/IconChatBubble.astro';
-import IconWrench from '../components/icons/IconWrench.astro';
 interface Props {
 	title: string;
 }
@@ -11,7 +7,6 @@ interface Props {
 const { title } = Astro.props;
 const currentPath = Astro.url.pathname;
 
-// 简单的辅助函数判断链接是否激活
 const isActive = (path: string) => {
     if (path === '/' && currentPath === '/') return true;
     if (path !== '/' && currentPath.startsWith(path)) return true;
@@ -23,60 +18,96 @@ const isActive = (path: string) => {
 <html lang="zh-cn">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{title}</title>
         <meta name="description" content="收集片刻，于静止与喧嚣之中。" />
 	</head>
-	<body class="bg-gray-100 h-screen overflow-hidden text-slate-800">
-        <div class="relative h-full w-full flex flex-col md:flex-row max-w-7xl mx-auto md:p-8">
-            
-            {/* Navigation Dock */}
-            <nav class="
-                fixed bottom-6 left-1/2 -translate-x-1/2 md:translate-x-0 md:static md:w-24 md:h-full z-40
-                flex md:flex-col items-center justify-center md:justify-start gap-2 md:gap-6
-                p-2 md:py-8 rounded-full md:rounded-2xl
-                bg-white/80 backdrop-blur-md shadow-xl border border-white/50
-                transition-all duration-300
-            ">
-                <a href="/" class={`group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive('/') ? 'bg-slate-200 text-slate-900 shadow-inner translate-y-px' : 'text-gray-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'}`}>
-                    <IconHome class="w-6 h-6" />
-                    <span class="sr-only">首页</span>
-                </a>
-                
-                <a href="/blog" class={`group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive('/blog') ? 'bg-slate-200 text-slate-900 shadow-inner translate-y-px' : 'text-gray-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'}`}>
-                    <IconBook class="w-6 h-6" />
-                    <span class="sr-only">文章</span>
-                </a>
-
-                <a href="/thoughts" class={`group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive('/thoughts') ? 'bg-slate-200 text-slate-900 shadow-inner translate-y-px' : 'text-gray-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'}`}>
-                    <IconChatBubble class="w-6 h-6" />
-                    <span class="sr-only">随笔</span>
-                </a>
-
-                <a href="/tools" class={`group relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${isActive('/tools') ? 'bg-slate-200 text-slate-900 shadow-inner translate-y-px' : 'text-gray-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'}`}>
-                    <IconWrench class="w-6 h-6" />
-                    <span class="sr-only">工具</span>
-                </a>
-            </nav>
-
-            {/* Main Content Paper */}
-            <main class="
-                flex-1 h-full overflow-hidden relative
-                md:ml-8 rounded-none md:rounded-3xl
-                bg-[#fdfbf7] shadow-2xl border border-white/40
-            ">
-                {/* Texture Overlay */}
-                <div class="absolute inset-0 pointer-events-none opacity-50 mix-blend-multiply" style="background-image: url('/img/cream-paper.png');"></div>
-
-                {/* Scrollable Area */}
-                <div class="h-full overflow-y-auto px-6 py-24 md:p-12 scroll-smooth">
-                    <slot />
-
-                    <div class="mt-20 pt-8 border-t border-slate-200 text-center text-slate-400 text-sm font-serif italic relative z-10">
-                        基于 Astro & Bun 构建
+	<body class="antialiased min-h-screen flex flex-col bg-white dark:bg-[#1b1b1d] text-[#1c1e21] dark:text-[#f5f6f7]">
+        {/* Navigation Bar */}
+        <nav class="sticky top-0 z-50 w-full bg-white/95 backdrop-blur border-b border-gray-200 dark:bg-[#1b1b1d]/95 dark:border-gray-800 transition-colors">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <a href="/" class="flex-shrink-0 flex items-center gap-3">
+                            <img src="/img/profile.png" alt="Logo" class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700" />
+                            <span class="font-bold text-lg text-gray-900 dark:text-white">GK Blog</span>
+                        </a>
+                        <div class="hidden sm:ml-8 sm:flex sm:space-x-8">
+                            <a href="/blog" class={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${isActive('/blog') ? 'border-[#25c2a0] text-gray-900 dark:text-white' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}>文章</a>
+                            <a href="/thoughts" class={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${isActive('/thoughts') ? 'border-[#25c2a0] text-gray-900 dark:text-white' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}>随笔</a>
+                            <a href="/tools" class={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${isActive('/tools') ? 'border-[#25c2a0] text-gray-900 dark:text-white' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}>工具</a>
+                        </div>
+                    </div>
+                    {/* Mobile Menu Button */}
+                    <div class="flex items-center sm:hidden">
+                        <button type="button" id="mobile-menu-button" class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none p-2" aria-label="Toggle menu">
+                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                <path id="menu-icon-open" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                <path id="menu-icon-close" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+
+            {/* Mobile Menu Drawer */}
+            <div id="mobile-menu" class="hidden sm:hidden bg-white dark:bg-[#1b1b1d] border-b border-gray-200 dark:border-gray-800 absolute w-full left-0 shadow-lg">
+                <div class="pt-2 pb-3 space-y-1 px-4">
+                    <a href="/blog" class={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/blog') ? 'bg-gray-50 dark:bg-gray-800 text-[#25c2a0]' : 'text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800'}`}>文章</a>
+                    <a href="/thoughts" class={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/thoughts') ? 'bg-gray-50 dark:bg-gray-800 text-[#25c2a0]' : 'text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800'}`}>随笔</a>
+                    <a href="/tools" class={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/tools') ? 'bg-gray-50 dark:bg-gray-800 text-[#25c2a0]' : 'text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800'}`}>工具</a>
+                </div>
+        </nav>
+
+        {/* Main Content Area */}
+        <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 prose dark:prose-invert">
+            <slot />
+        </main>
+
+        {/* Footer */}
+        <footer class="bg-[#1b1b1d] text-white py-12 mt-auto">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">站内链接</h3>
+                        <ul class="space-y-2">
+                            <li><a href="/" class="text-gray-300 hover:text-white transition-colors">首页 /</a></li>
+                            <li><a href="/blog" class="text-gray-300 hover:text-white transition-colors">文章 /blog</a></li>
+                            <li><a href="/thoughts" class="text-gray-300 hover:text-white transition-colors">随笔 /thoughts</a></li>
+                            <li><a href="/tools" class="text-gray-300 hover:text-white transition-colors">工具 /tools</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">我的其他网站</h3>
+                        <ul class="space-y-2">
+                            <li><a href="https://github.com/guokai" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">GitHub <span class="text-xs ml-1 opacity-50">↗</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-12 text-center text-gray-400 text-sm">
+                    版权所有 © {new Date().getFullYear()} GK Blog. 基于 Astro 构建。
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Mobile menu toggle logic
+            document.addEventListener('DOMContentLoaded', () => {
+                const button = document.getElementById('mobile-menu-button');
+                const menu = document.getElementById('mobile-menu');
+                const iconOpen = document.getElementById('menu-icon-open');
+                const iconClose = document.getElementById('menu-icon-close');
+
+                if (button && menu && iconOpen && iconClose) {
+                    button.addEventListener('click', () => {
+                        menu.classList.toggle('hidden');
+                        iconOpen.classList.toggle('hidden');
+                        iconOpen.classList.toggle('inline-flex');
+                        iconClose.classList.toggle('hidden');
+                        iconClose.classList.toggle('inline-flex');
+                    });
+                }
+            });
+        </script>
 	</body>
 </html>
