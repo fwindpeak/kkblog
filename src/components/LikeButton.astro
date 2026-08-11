@@ -22,7 +22,8 @@ const { id, type, initialLikes = 0 } = Astro.props;
 
 <script>
   const buttons = document.querySelectorAll('.like-btn');
-  const serverUrl = import.meta.env.PUBLIC_SERVER_URL || 'http://localhost:3000';
+  // Use relative URL so it works on any domain and port
+  const serverUrl = '';
 
   buttons.forEach(btn => {
     btn.addEventListener('click', async () => {
