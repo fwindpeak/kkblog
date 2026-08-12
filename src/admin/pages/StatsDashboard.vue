@@ -69,7 +69,7 @@ onMounted(() => {
       <!-- Top Pages -->
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
         <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-          <h3 class="font-bold text-slate-900">最受欢迎页面 (Top 10)</h3>
+          <h3 class="font-bold text-slate-900">全部页面访问统计</h3>
         </div>
         <div class="p-0 flex-1 overflow-y-auto">
           <table class="w-full text-left text-sm">
@@ -84,8 +84,8 @@ onMounted(() => {
                 <td colspan="2" class="py-8">暂无数据</td>
               </tr>
               <tr v-for="(page, index) in stats?.topPages" :key="index" class="hover:bg-slate-50 transition-colors">
-                <td class="px-6 py-3 font-medium text-slate-700 truncate max-w-[200px]" :title="page.path">
-                  {{ page.path }}
+                <td class="px-6 py-3 font-medium truncate max-w-[200px]" :title="page.path">
+                  <a :href="page.path" target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline transition-colors">{{ page.path }}</a>
                 </td>
                 <td class="px-6 py-3 text-right font-bold text-slate-900">
                   {{ page.views }}
@@ -115,8 +115,8 @@ onMounted(() => {
                 <td colspan="3" class="py-8">暂无数据</td>
               </tr>
               <tr v-for="(visit, index) in stats?.recentVisits" :key="index" class="hover:bg-slate-50 transition-colors">
-                <td class="px-6 py-3 text-slate-700 truncate max-w-[150px]" :title="visit.path">
-                  {{ visit.path }}
+                <td class="px-6 py-3 truncate max-w-[150px]" :title="visit.path">
+                  <a :href="visit.path" target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline transition-colors">{{ visit.path }}</a>
                 </td>
                 <td class="px-6 py-3 text-slate-500 font-mono text-xs">
                   {{ visit.ip }}

@@ -23,7 +23,7 @@ export const request = async <T>(
         'Content-Type': 'application/json',
     };
 
-    if (method !== 'GET') {
+    if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
 

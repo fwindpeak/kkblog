@@ -56,7 +56,7 @@ bun run dev
 
 运行后，全栈系统将启动在 `http://localhost:4321`，其中：
 - 博客前台：`http://localhost:4321/`
-- 管理后台：`http://localhost:4321/admin`
+- 管理后台：`http://localhost:4321/gk-admin`
 - 后端 API：`http://localhost:4321/api/*`
 
 无需再开启多个终端，开发体验极为流畅。

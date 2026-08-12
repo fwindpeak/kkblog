@@ -1,10 +1,9 @@
 import type { APIRoute } from 'astro';
 import { db } from '../../lib/db';
-import { jsonResponse } from '../../lib/apiHelper';
+import { jsonResponse, verifyAuth } from '../../lib/apiHelper';
 
 export const GET: APIRoute = async ({ request }) => {
-  const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-  if (token !== import.meta.env.ADMIN_SECRET) {
+  if (!verifyAuth(request)) {
     return jsonResponse({ error: 'Unauthorized' }, 401);
   }
 
@@ -15,8 +14,7 @@ export const GET: APIRoute = async ({ request }) => {
       SELECT path, COUNT(*) as views 
       FROM page_views 
       GROUP BY path 
-      ORDER BY views DESC 
-      LIMIT 10
+      ORDER BY views DESC
     `).all();
     const recentVisits = db.query(`
       SELECT path, ip, created_at 

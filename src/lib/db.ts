@@ -85,6 +85,14 @@ db.run(`
   )
 `);
 
+db.run(`
+  CREATE TABLE IF NOT EXISTS login_attempts (
+    ip TEXT PRIMARY KEY,
+    attempts INTEGER DEFAULT 0,
+    locked_until INTEGER DEFAULT 0
+  )
+`);
+
 // Migrations
 try { db.run("ALTER TABLE posts ADD COLUMN likes INTEGER DEFAULT 0"); } catch (e) { }
 try { db.run("ALTER TABLE thoughts ADD COLUMN likes INTEGER DEFAULT 0"); } catch (e) { }
