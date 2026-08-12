@@ -2,6 +2,11 @@
 import { ref, onMounted } from 'vue';
 import { request } from '../lib/api';
 import { formatDateTime } from '../../lib/utils';
+import { useDialog } from '../hooks/useDialog';
+import { inject } from 'vue';
+
+type UseDialogType = ReturnType<typeof useDialog>;
+const dialog = inject<UseDialogType>('dialog');
 
 interface TopPage {
   path: string;
@@ -35,6 +40,32 @@ const fetchStats = async () => {
     console.error('Failed to fetch stats:', error);
   } finally {
     loading.value = false;
+  }
+};
+
+const handleCleanImages = async () => {
+  if (!dialog) return;
+  const confirmed = await dialog.confirm({
+    title: '确认清理？',
+    message: '此操作将扫描并永久删除所有未被文章和随笔引用的冗余图片（保留最近 24 小时内上传的图片以防误删），确定执行吗？',
+    type: 'warning',
+    confirmText: '开始清理'
+  });
+  
+  if (confirmed) {
+    loading.value = true;
+    try {
+      const res = await request<{ deletedCount: number }>('/api/clean-images', 'POST');
+      if (res) {
+        dialog.alert({
+          title: '清理完成',
+          message: `成功清理了 ${res.deletedCount} 张冗余图片！`,
+          type: 'success'
+        });
+      }
+    } finally {
+      loading.value = false;
+    }
   }
 };
 
@@ -128,6 +159,28 @@ onMounted(() => {
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+      
+      <!-- System Maintenance -->
+      <div class="md:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col mt-2">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="font-bold text-slate-900">系统维护</h3>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-lg">
+            <div>
+              <h4 class="font-bold text-slate-800">存储空间瘦身</h4>
+              <p class="text-sm text-slate-500 mt-1">自动扫描并删除已不再使用的冗余图片（支持本地硬盘和七牛云）。安全起见，仅清理上传时间超过 24 小时的孤儿图片。</p>
+            </div>
+            <button 
+              @click="handleCleanImages" 
+              class="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors shrink-0 font-medium disabled:opacity-50"
+              :disabled="loading"
+            >
+              一键扫描并清理
+            </button>
+          </div>
         </div>
       </div>
     </div>

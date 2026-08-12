@@ -2,7 +2,7 @@
 import { ref, onMounted, inject } from 'vue';
 import { request } from '../lib/api';
 import { useDialog } from '../hooks/useDialog';
-import { formatDateTime } from '../lib/utils';
+import { formatDateTime } from '../../lib/utils';
 type UseDialogType = ReturnType<typeof useDialog>;
 
 // 注入全局对话框功能

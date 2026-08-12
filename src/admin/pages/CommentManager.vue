@@ -3,7 +3,7 @@ import { ref, onMounted, inject } from 'vue';
 import { request } from '../lib/api';
 import { IconTrash } from '../components/Icons';
 import { useDialog } from '../hooks/useDialog';
-import { formatDateTime } from '../lib/utils';
+import { formatDateTime } from '../../lib/utils';
 type UseDialogType = ReturnType<typeof useDialog>;
 
 const dialog = inject<UseDialogType>('dialog');
