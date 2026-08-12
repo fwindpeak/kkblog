@@ -2,6 +2,7 @@
 import { ref, onMounted, inject } from 'vue';
 import { request } from '../lib/api';
 import { useDialog } from '../hooks/useDialog';
+import { formatDateTime } from '../lib/utils';
 type UseDialogType = ReturnType<typeof useDialog>;
 
 // 注入全局对话框功能
@@ -42,10 +43,7 @@ const moodMap: Record<string, string> = {
 
 const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
-    const date = new Date(dateStr.replace(' ', 'T'));
-    return date.toLocaleString('zh-CN', {
-        month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-    });
+    return formatDateTime(dateStr);
 };
 
 const loadThoughts = async () => {

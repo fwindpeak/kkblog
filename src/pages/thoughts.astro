@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { marked } from 'marked';
 import LikeButton from '../components/LikeButton.astro';
 import { db } from '../lib/db';
+import { formatDateTime } from '../lib/utils';
 
 export const prerender = true;
 
@@ -37,7 +38,7 @@ const moodMap: Record<string, string> = {
                         <div>
                             <div class="font-bold text-sm text-gray-900 dark:text-gray-100">GK</div>
                             <div class="text-xs text-gray-500 dark:text-gray-400 flex gap-2 items-center">
-                                <span>{new Date(thought.created_at).toLocaleString()}</span>
+                                <span>{formatDateTime(thought.created_at)}</span>
                                 {thought.mood && (
                                     <span class="opacity-75 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-[10px]">
                                         {moodMap[thought.mood] || thought.mood}

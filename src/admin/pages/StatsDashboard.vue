@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { request } from '../lib/api';
+import { formatDateTime } from '../../lib/utils';
 
 interface TopPage {
   path: string;
@@ -122,7 +123,7 @@ onMounted(() => {
                   {{ visit.ip }}
                 </td>
                 <td class="px-6 py-3 text-right text-slate-400 text-xs">
-                  {{ new Date(visit.created_at).toLocaleString() }}
+                  {{ formatDateTime(visit.created_at) }}
                 </td>
               </tr>
             </tbody>

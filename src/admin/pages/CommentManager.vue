@@ -3,6 +3,7 @@ import { ref, onMounted, inject } from 'vue';
 import { request } from '../lib/api';
 import { IconTrash } from '../components/Icons';
 import { useDialog } from '../hooks/useDialog';
+import { formatDateTime } from '../lib/utils';
 type UseDialogType = ReturnType<typeof useDialog>;
 
 const dialog = inject<UseDialogType>('dialog');
@@ -57,7 +58,6 @@ onMounted(loadComments);
                         <th class="p-4 font-bold text-slate-600">作者</th>
                         <th class="p-4 font-bold text-slate-600">内容</th>
                         <th class="p-4 font-bold text-slate-600">目标</th>
-                        <th class="p-4 font-bold text-slate-600">时间</th>
                         <th class="p-4 font-bold text-slate-600 text-right">操作</th>
                     </tr>
                 </thead>
@@ -65,6 +65,7 @@ onMounted(loadComments);
                     <tr v-for="c in comments" :key="c.id" class="hover:bg-slate-50">
                         <td class="p-4">
                             <div class="font-bold text-slate-800">{{ c.author }}</div>
+                            <div class="text-xs text-slate-500 mt-1 font-mono">{{ formatDateTime(c.created_at) }}</div>
                         </td>
                         <td class="p-4">
                             <p class="text-slate-600 line-clamp-2 max-w-md">{{ c.content }}</p>
@@ -75,9 +76,6 @@ onMounted(loadComments);
                                 {{ c.target_type }}
                             </span>
                             <span class="text-xs font-mono text-slate-400">{{ c.target_id }}</span>
-                        </td>
-                        <td class="p-4 text-slate-500 text-xs">
-                            {{ new Date(c.created_at).toLocaleString() }}
                         </td>
                         <td class="p-4 text-right">
                             <button @click="handleDelete(c.id)" class="text-red-500 p-1 hover:bg-red-50 rounded">
