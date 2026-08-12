@@ -3,6 +3,9 @@
      color: #1c1e21; /* Docusaurus default text color */
      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
      -webkit-font-smoothing: antialiased;
+     font-size: 1.125rem; /* 18px base for better readability */
+     line-height: 1.8; /* Relaxed line height */
+     letter-spacing: 0.01em; /* Slight letter spacing for Chinese/English mixed text */
  }
 
  /* Dark mode support (optional baseline) */
@@ -40,15 +43,15 @@
  }
 
  .prose p {
-     margin-bottom: 1.25em;
-     line-height: 1.7;
+     margin-bottom: 1.6em; /* Increased from 1.25em for better breathing room */
+     line-height: 1.8; /* Increased for readability */
  }
 
  .prose ul {
      list-style-type: disc;
      padding-left: 1.5em;
-     margin-bottom: 1.25em;
-     line-height: 1.7;
+     margin-bottom: 1.6em;
+     line-height: 1.8;
  }
 
  .prose li {
