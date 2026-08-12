@@ -91,8 +91,16 @@ const isActive = (path: string) => {
         </footer>
 
         <script>
+            import mediumZoom from 'medium-zoom';
+
             // Mobile menu toggle logic
             document.addEventListener('DOMContentLoaded', () => {
+                // Initialize image zoom
+                mediumZoom('.zoomable-image', {
+                    margin: 32,
+                    background: 'rgba(0, 0, 0, 0.85)',
+                });
+
                 const button = document.getElementById('mobile-menu-button');
                 const menu = document.getElementById('mobile-menu');
                 const iconOpen = document.getElementById('menu-icon-open');

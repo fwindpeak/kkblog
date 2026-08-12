@@ -56,7 +56,11 @@ export const POST: APIRoute = async ({ request }) => {
             console.error('Qiniu upload error:', err);
             resolve(jsonResponse({ error: "上传七牛云失败" }, 500));
           } else if (info.statusCode === 200) {
-            const fileUrl = `${DOMAIN.replace(/\/$/, '')}/${qiniuKey}`;
+            let safeDomain = DOMAIN.replace(/\/$/, '');
+            if (!safeDomain.startsWith('http') && !safeDomain.startsWith('//')) {
+              safeDomain = `//${safeDomain}`;
+            }
+            const fileUrl = `${safeDomain}/${qiniuKey}`;
             resolve(jsonResponse({ success: true, url: fileUrl }));
           } else {
             console.error('Qiniu response:', body);

@@ -114,3 +114,12 @@
  button {
      cursor: pointer;
  }
+
+ /* Override medium-zoom z-index to ensure it sits above the navigation bar (z-50) and content containers (z-10) */
+ .medium-zoom-overlay,
+ .medium-zoom-overlay ~ .medium-zoom-image {
+   z-index: 9999 !important;
+ }
+ .medium-zoom-image--opened {
+   z-index: 10000 !important;
+ }
