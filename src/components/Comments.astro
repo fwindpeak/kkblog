@@ -8,7 +8,7 @@ interface Props {
 const { id, type } = Astro.props;
 ---
 
-<comment-widget data-id={id} data-type={type} class="block mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+<comment-widget data-id={id} data-type={type} class="block">
   <details class="group">
     <summary class="cursor-pointer font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-4 hover:text-gray-900 dark:hover:text-white transition-colors outline-none select-none">
       <span class="text-sm">讨论区</span>
