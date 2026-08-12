@@ -8,109 +8,121 @@ interface Props {
 const { id, type } = Astro.props;
 ---
 
-<div class="comments-section mt-12 pt-8 border-t border-gray-100">
-  <h3 class="text-xl font-bold mb-6">评论</h3>
-  
-  <!-- 评论列表 -->
-  <div id="comments-list" class="space-y-6 mb-8" data-id={id} data-type={type}>
-    <p class="text-gray-400 italic">正在加载评论...</p>
-  </div>
+<comment-widget data-id={id} data-type={type} class="block mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+  <details class="group">
+    <summary class="cursor-pointer font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-4 hover:text-gray-900 dark:hover:text-white transition-colors outline-none select-none">
+      <span class="text-sm">讨论区</span>
+      <span class="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-gray-500 comment-count">0</span>
+    </summary>
+    
+    <div class="mt-4">
+      <!-- 评论列表 -->
+      <div class="comments-list space-y-4 mb-6">
+        <p class="text-gray-400 text-sm italic">正在加载...</p>
+      </div>
 
-  <!-- 评论表单 -->
-  <div class="comment-form bg-gray-50 p-6 rounded-xl">
-    <h4 class="text-lg font-medium mb-4">发表评论</h4>
-    <div class="space-y-4">
-      <input 
-        type="text" 
-        id="comment-author" 
-        placeholder="你的昵称" 
-        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <textarea 
-        id="comment-content" 
-        rows="3" 
-        placeholder="说点什么吧..." 
-        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      ></textarea>
-      <button 
-        id="submit-comment" 
-        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-      >
-        提交评论
-      </button>
+      <!-- 评论表单 -->
+      <div class="comment-form bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl">
+        <div class="space-y-3">
+          <input 
+            type="text" 
+            class="comment-author w-full px-3 py-2 text-sm bg-white dark:bg-[#1b1b1d] border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-white"
+            placeholder="你的昵称 (选填)" 
+          />
+          <textarea 
+            class="comment-content w-full px-3 py-2 text-sm bg-white dark:bg-[#1b1b1d] border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-white"
+            rows="2" 
+            placeholder="说点什么吧..." 
+          ></textarea>
+          <div class="flex justify-end">
+            <button class="submit-comment px-4 py-1.5 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 text-sm rounded-lg hover:bg-slate-700 dark:hover:bg-white transition-colors font-medium disabled:opacity-50">
+              发布
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  </details>
+</comment-widget>
 
 <script>
   import { formatDateTime } from '../lib/utils';
-  const list = document.getElementById('comments-list');
-  const authorInput = document.getElementById('comment-author') as HTMLInputElement;
-  const contentInput = document.getElementById('comment-content') as HTMLTextAreaElement;
-  const submitBtn = document.getElementById('submit-comment');
-  const serverUrl = import.meta.env.PUBLIC_SERVER_URL || 'http://localhost:3000';
 
-  if (list) {
-    const id = list.getAttribute('data-id');
-    const type = list.getAttribute('data-type');
+  class CommentWidget extends HTMLElement {
+    connectedCallback() {
+      const id = this.dataset.id;
+      const type = this.dataset.type;
+      const list = this.querySelector('.comments-list');
+      const authorInput = this.querySelector('.comment-author') as HTMLInputElement;
+      const contentInput = this.querySelector('.comment-content') as HTMLTextAreaElement;
+      const submitBtn = this.querySelector('.submit-comment') as HTMLButtonElement;
+      const countBadge = this.querySelector('.comment-count');
 
-    async function loadComments() {
-      try {
-        const res = await fetch(`${serverUrl}/api/comments?id=${id}&type=${type}`);
-        const comments = await res.json();
-        
-        if (comments.length === 0) {
-          list.innerHTML = '<p class="text-gray-400 italic">暂无评论，快来抢沙发吧！</p>';
-          return;
-        }
+      const loadComments = async () => {
+        try {
+          const res = await fetch(`/api/comments?id=${id}&type=${type}`);
+          const comments = await res.json();
+          
+          if (countBadge) countBadge.textContent = comments.length.toString();
 
-        list.innerHTML = comments.map((c: any) => `
-          <div class="comment-item">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="font-bold text-gray-800">${c.author}</span>
-              <span class="text-xs text-gray-400">${formatDateTime(c.created_at)}</span>
+          if (comments.length === 0) {
+            list!.innerHTML = '<p class="text-gray-400 text-sm italic">暂无评论，快来抢沙发吧！</p>';
+            return;
+          }
+
+          list!.innerHTML = comments.map((c: any) => `
+            <div class="comment-item text-sm">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="font-bold text-gray-800 dark:text-gray-200">${c.author}</span>
+                <span class="text-xs text-gray-400">${formatDateTime(c.created_at)}</span>
+              </div>
+              <p class="text-gray-600 dark:text-gray-400">${c.content}</p>
             </div>
-            <p class="text-gray-600">${c.content}</p>
-          </div>
-        `).join('');
-      } catch (e) {
-        list.innerHTML = '<p class="text-red-400">加载评论失败</p>';
+          `).join('');
+        } catch (e) {
+          list!.innerHTML = '<p class="text-red-400 text-sm">加载评论失败</p>';
+        }
+      };
+
+      loadComments();
+
+      if (submitBtn) {
+        submitBtn.addEventListener('click', async () => {
+          const author = authorInput.value.trim() || '匿名';
+          const content = contentInput.value.trim();
+
+          if (!content) {
+            alert('请输入评论内容');
+            return;
+          }
+
+          submitBtn.disabled = true;
+          submitBtn.innerText = '提交中...';
+
+          try {
+            const res = await fetch(`/api/comment`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type, id, author, content })
+            });
+
+            if (res.ok) {
+              contentInput.value = '';
+              loadComments();
+            }
+          } catch (e) {
+            alert('提交失败');
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = '发布';
+          }
+        });
       }
     }
+  }
 
-    loadComments();
-
-    if (submitBtn) {
-      submitBtn.addEventListener('click', async () => {
-        const author = authorInput.value.trim() || '匿名';
-        const content = contentInput.value.trim();
-
-        if (!content) {
-          alert('请输入评论内容');
-          return;
-        }
-
-        submitBtn.setAttribute('disabled', 'true');
-        submitBtn.innerText = '提交中...';
-
-        try {
-          const res = await fetch(`${serverUrl}/api/comment`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type, id, author, content })
-          });
-
-          if (res.ok) {
-            contentInput.value = '';
-            loadComments();
-          }
-        } catch (e) {
-          alert('提交失败');
-        } finally {
-          submitBtn.removeAttribute('disabled');
-          submitBtn.innerText = '提交评论';
-        }
-      });
-    }
+  // Prevent defining multiple times during HMR
+  if (!customElements.get('comment-widget')) {
+    customElements.define('comment-widget', CommentWidget);
   }
 </script>

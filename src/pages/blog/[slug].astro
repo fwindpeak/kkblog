@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Comments from '../../components/Comments.astro';
 import { marked } from 'marked';
 import { db } from '../../lib/db';
 
@@ -42,8 +43,9 @@ const contentHtml = await marked.parse(post.content);
                    {post.title}
                </h1>
            </header>
-           
            <div class="prose prose-lg max-w-none font-serif text-slate-800/80 prose-headings:font-serif prose-a:text-blue-600" set:html={contentHtml} />
+           
+           <Comments id={post.id} type="post" />
        </article>
    </div>
 </Layout>
