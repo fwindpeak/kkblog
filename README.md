@@ -40,7 +40,17 @@ gkblog-astro/
 
 - 安装 [Bun](https://bun.sh/) (推荐) 或 Node.js 18+
 
-### 2. 安装依赖
+### 2. 环境变量配置
+
+复制 `.env.example` 为 `.env` 并根据需要进行修改：
+
+```bash
+cp .env.example .env
+```
+
+主要的系统配置都在 `.env` 中，详见后文的 **环境变量配置** 章节。
+
+### 3. 安装依赖
 
 在项目根目录下直接运行：
 
@@ -48,7 +58,7 @@ gkblog-astro/
 bun install
 ```
 
-### 3. 启动开发服务器
+### 4. 启动开发服务器
 
 ```bash
 bun run dev
@@ -88,7 +98,22 @@ ADMIN_SECRET=your_secure_password HOST=0.0.0.0 PORT=3000 bun run start
 
 ### 3. 图片持久化 (重要)
 
-上传的图片将默认存放在根目录下的 `uploads/` 目录中。在容器化部署或云主机部署时，请确保将该 `uploads` 文件夹以及 `blog.db` 文件进行持久化挂载，防止重启或重新构建时数据丢失。
+如果没有配置七牛云，上传的图片将默认存放在根目录下的 `uploads/` 目录中。在容器化部署或云主机部署时，请确保将该 `uploads` 文件夹以及 `blog.db` 文件进行持久化挂载，防止重启或重新构建时数据丢失。
+
+---
+
+## 环境变量配置
+
+在项目根目录的 `.env` 中，支持以下环境变量：
+
+*   **`PUBLIC_SERVER_URL`**, **`VITE_SERVER_URL`**, **`VITE_API_URL`**: Astro 前台页面和 Vue 后台页面请求后端 API 的基础地址。本地开发默认 `http://localhost:4321`，生产环境需配置为你的实际域名（如 `https://blog.example.com`）。
+*   **`ADMIN_SECRET`**: 后台管理系统登录和 API 鉴权的密钥，建议修改为强密码（默认为 `123456`）。
+*   **`DB_PATH`**: SQLite 数据库文件的存放路径。如果不配置，默认会在根目录下创建 `blog.db`。
+*   **七牛云存储配置 (可选)**: 用于图片上传。如果不配置，图片将默认保存在本地 `uploads/` 目录下。
+    *   `QINIU_ACCESS_KEY`: 七牛云 AK
+    *   `QINIU_SECRET_KEY`: 七牛云 SK
+    *   `QINIU_BUCKET`: 存储桶名称
+    *   `QINIU_DOMAIN`: 绑定的下载域名
 
 ---
 
@@ -116,8 +141,8 @@ Authorization: Bearer {ADMIN_SECRET}
     *   `POST /api/thought` - 创建/更新随笔（需鉴权）
     *   `DELETE /api/thought/:id` - 删除随笔（需鉴权）
 *   **文件上传**：
-    *   `POST /api/upload` - 上传图片文件，自动保存至 `./uploads/` 并返回相对路径 `/api/uploads/:filename`（需鉴权）
-    *   `GET /api/uploads/:filename` - 访问已上传的图片
+    *   `POST /api/upload` - 上传图片文件，如果配置了七牛云环境变量，则上传到七牛云；否则自动保存至本地 `./uploads/` 并返回相对路径 `/api/uploads/:filename`（需鉴权）
+    *   `GET /api/uploads/:filename` - 访问本地已上传的图片
 *   **互动模块**：
     *   `POST /api/like` - 文章/随笔点赞
     *   `GET /api/comments` - 获取目标评论列表
