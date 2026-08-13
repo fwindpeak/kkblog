@@ -1,5 +1,44 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const tools = [
+  {
+    name: "lutcut",
+    description: "纯浏览器的本地视频剪辑工具，可以套lut导出",
+    url: "https://fwindpeak.github.io/lutcut/",
+    icon: "🎬"
+  },
+  {
+    name: "NC2000-wasm",
+    description: "文曲星NC2000系列模拟器，浏览器版",
+    url: "https://fwindpeak.github.io/NC2000-wasm/",
+    icon: "📟"
+  },
+  {
+    name: "LavStudio",
+    description: "网页版LavaX编译、反编译、编辑器",
+    url: "https://fwindpeak.github.io/LavStudio/",
+    icon: "💻"
+  },
+  {
+    name: "vibe-cocktail",
+    description: "情绪调酒模拟器",
+    url: "https://fwindpeak.github.io/vibe-cocktail/",
+    icon: "🍸"
+  },
+  {
+    name: "applab",
+    description: "Oculus Quest Applab page.",
+    url: "https://fwindpeak.github.io/applab/",
+    icon: "🥽"
+  },
+  {
+    name: "vite-tetris",
+    description: "Use React, Redux, Immutable to code Tetris. 🎮 Build with vite.",
+    url: "https://fwindpeak.github.io/vite-tetris/",
+    icon: "🎮"
+  }
+];
 ---
 
 <Layout title="工具">
@@ -10,23 +49,23 @@ import Layout from '../layouts/Layout.astro';
         </header>
         
         <div class="grid md:grid-cols-2 gap-6">
-            <div class="group relative bg-slate-100 rounded-lg p-6 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-colors">
-                <div class="absolute top-4 right-4 text-xs font-mono text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">
-                    UTIL-01
-                </div>
-                <div class="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center mb-4 text-xl">
-                    🎨
-                </div>
-                <h3 class="text-lg font-bold text-slate-900 font-sans mb-2">配色生成器</h3>
-                <p class="text-sm text-slate-500 mb-6 font-serif leading-relaxed">
-                    从上传的图片中提取主色调，并生成语义化的 Tailwind 配置。
-                </p>
-                <button class="w-full py-2 bg-white border border-slate-300 rounded font-mono text-xs text-slate-900 uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-colors shadow-sm">
-                    启动
-                </button>
-            </div>
-    
-            {/* 更多工具卡片... */}
+            {tools.map((tool, index) => (
+                <a href={tool.url} target="_blank" rel="noopener noreferrer" class="group relative bg-slate-100 rounded-lg p-6 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-colors block cursor-pointer">
+                    <div class="absolute top-4 right-4 text-xs font-mono text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">
+                        UTIL-{String(index + 1).padStart(2, '0')}
+                    </div>
+                    <div class="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center mb-4 text-xl">
+                        {tool.icon}
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 font-sans mb-2">{tool.name}</h3>
+                    <p class="text-sm text-slate-500 mb-6 font-serif leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                        {tool.description}
+                    </p>
+                    <div class="w-full py-2 bg-white border border-slate-300 rounded font-mono text-xs text-slate-900 uppercase tracking-widest text-center group-hover:bg-slate-900 group-hover:text-white transition-colors shadow-sm">
+                        启动
+                    </div>
+                </a>
+            ))}
         </div>
     </div>
 </Layout>
