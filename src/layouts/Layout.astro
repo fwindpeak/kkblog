@@ -1,49 +1,97 @@
 ---
-import '../globals.css'
+import "../globals.css";
 interface Props {
-	title: string;
+    title: string;
 }
 
 const { title } = Astro.props;
 const currentPath = Astro.url.pathname;
 
 const isActive = (path: string) => {
-    if (path === '/' && currentPath === '/') return true;
-    if (path !== '/' && currentPath.startsWith(path)) return true;
+    if (path === "/" && currentPath === "/") return true;
+    if (path !== "/" && currentPath.startsWith(path)) return true;
     return false;
 };
 ---
 
 <!doctype html>
 <html lang="zh-cn">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>{title}</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{title}</title>
         <meta name="description" content="收集片刻，于静止与喧嚣之中。" />
-	</head>
-	<body class="antialiased min-h-screen flex flex-col bg-white dark:bg-[#1b1b1d] text-[#1c1e21] dark:text-[#f5f6f7]">
+    </head>
+    <body
+        class="antialiased min-h-screen flex flex-col bg-white dark:bg-[#1b1b1d] text-[#1c1e21] dark:text-[#f5f6f7]"
+    >
         {/* Navigation Bar */}
-        <nav class="sticky top-0 z-50 w-full bg-white/95 backdrop-blur border-b border-gray-200 dark:bg-[#1b1b1d]/95 dark:border-gray-800 transition-colors">
+        <nav
+            class="sticky top-0 z-50 w-full bg-white/95 backdrop-blur border-b border-gray-200 dark:bg-[#1b1b1d]/95 dark:border-gray-800 transition-colors"
+        >
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <div class="flex items-center">
-                        <a href="/" class="flex-shrink-0 flex items-center gap-3">
-                            <img src="/img/profile.png" alt="Logo" class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700" />
-                            <span class="font-bold text-lg text-gray-900 dark:text-white">GK Blog</span>
+                        <a
+                            href="/"
+                            class="flex-shrink-0 flex items-center gap-3"
+                        >
+                            <img
+                                src="/img/profile.png"
+                                alt="Logo"
+                                class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700"
+                            />
+                            <span
+                                class="font-bold text-lg text-gray-900 dark:text-white"
+                                >GK Blog</span
+                            >
                         </a>
                         <div class="hidden sm:ml-8 sm:flex sm:space-x-8">
-                            <a href="/blog" class={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${isActive('/blog') ? 'border-[#25c2a0] text-gray-900 dark:text-white' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}>文章</a>
-                            <a href="/thoughts" class={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${isActive('/thoughts') ? 'border-[#25c2a0] text-gray-900 dark:text-white' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}>随笔</a>
-                            <a href="/tools" class={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${isActive('/tools') ? 'border-[#25c2a0] text-gray-900 dark:text-white' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}>工具</a>
+                            <a
+                                href="/blog"
+                                class={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${isActive("/blog") ? "border-[#25c2a0] text-gray-900 dark:text-white" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}`}
+                                >文章</a
+                            >
+                            <a
+                                href="/thoughts"
+                                class={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${isActive("/thoughts") ? "border-[#25c2a0] text-gray-900 dark:text-white" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}`}
+                                >随笔</a
+                            >
+                            <a
+                                href="/tools"
+                                class={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${isActive("/tools") ? "border-[#25c2a0] text-gray-900 dark:text-white" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"}`}
+                                >工具</a
+                            >
                         </div>
                     </div>
                     {/* Mobile Menu Button */}
                     <div class="flex items-center sm:hidden">
-                        <button type="button" id="mobile-menu-button" class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none p-2" aria-label="Toggle menu">
-                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                <path id="menu-icon-open" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                <path id="menu-icon-close" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <button
+                            type="button"
+                            id="mobile-menu-button"
+                            class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none p-2"
+                            aria-label="Toggle menu"
+                        >
+                            <svg
+                                class="h-6 w-6"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    id="menu-icon-open"
+                                    class="inline-flex"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                                <path
+                                    id="menu-icon-close"
+                                    class="hidden"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
                     </div>
@@ -51,82 +99,135 @@ const isActive = (path: string) => {
             </div>
 
             {/* Mobile Menu Drawer */}
-            <div id="mobile-menu" class="hidden sm:hidden bg-white dark:bg-[#1b1b1d] border-b border-gray-200 dark:border-gray-800 absolute w-full left-0 shadow-lg">
+            <div
+                id="mobile-menu"
+                class="hidden sm:hidden bg-white dark:bg-[#1b1b1d] border-b border-gray-200 dark:border-gray-800 absolute w-full left-0 shadow-lg"
+            >
                 <div class="pt-2 pb-3 space-y-1 px-4">
-                    <a href="/blog" class={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/blog') ? 'bg-gray-50 dark:bg-gray-800 text-[#25c2a0]' : 'text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800'}`}>文章</a>
-                    <a href="/thoughts" class={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/thoughts') ? 'bg-gray-50 dark:bg-gray-800 text-[#25c2a0]' : 'text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800'}`}>随笔</a>
-                    <a href="/tools" class={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/tools') ? 'bg-gray-50 dark:bg-gray-800 text-[#25c2a0]' : 'text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800'}`}>工具</a>
-                </div>
-        </nav>
-
-        {/* Main Content Area */}
-        <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 prose dark:prose-invert">
-            <slot />
-        </main>
-
-        {/* Footer */}
-        <footer class="bg-[#1b1b1d] text-white py-12 mt-auto">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-lg font-bold mb-4">站内链接</h3>
-                        <ul class="space-y-2">
-                            <li><a href="/" class="text-gray-300 hover:text-white transition-colors">首页 /</a></li>
-                            <li><a href="/blog" class="text-gray-300 hover:text-white transition-colors">文章 /blog</a></li>
-                            <li><a href="/thoughts" class="text-gray-300 hover:text-white transition-colors">随笔 /thoughts</a></li>
-                            <li><a href="/tools" class="text-gray-300 hover:text-white transition-colors">工具 /tools</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold mb-4">我的其他网站</h3>
-                        <ul class="space-y-2">
-                            <li><a href="https://github.com/guokai" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">GitHub <span class="text-xs ml-1 opacity-50">↗</span></a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="mt-12 text-center text-gray-400 text-sm">
-                    版权所有 © {new Date().getFullYear()} GK Blog. 基于 Astro 构建。
+                    <a
+                        href="/blog"
+                        class={`block px-3 py-2 rounded-md text-base font-medium ${isActive("/blog") ? "bg-gray-50 dark:bg-gray-800 text-[#25c2a0]" : "text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                        >文章</a
+                    >
+                    <a
+                        href="/thoughts"
+                        class={`block px-3 py-2 rounded-md text-base font-medium ${isActive("/thoughts") ? "bg-gray-50 dark:bg-gray-800 text-[#25c2a0]" : "text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                        >随笔</a
+                    >
+                    <a
+                        href="/tools"
+                        class={`block px-3 py-2 rounded-md text-base font-medium ${isActive("/tools") ? "bg-gray-50 dark:bg-gray-800 text-[#25c2a0]" : "text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                        >工具</a
+                    >
                 </div>
             </div>
-        </footer>
 
-        <script>
-            import mediumZoom from 'medium-zoom';
+            {/* Main Content Area */}
+            <main
+                class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 prose dark:prose-invert"
+            >
+                <slot />
+            </main>
 
-            // Mobile menu toggle logic
-            document.addEventListener('DOMContentLoaded', () => {
-                // Initialize image zoom
-                mediumZoom('.zoomable-image', {
-                    margin: 32,
-                    background: 'rgba(0, 0, 0, 0.85)',
+            {/* Footer */}
+            <footer class="bg-[#1b1b1d] text-white py-12 mt-auto">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">站内链接</h3>
+                            <ul class="space-y-2">
+                                <li>
+                                    <a
+                                        href="/"
+                                        class="text-gray-300 hover:text-white transition-colors"
+                                        >首页 /</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/blog"
+                                        class="text-gray-300 hover:text-white transition-colors"
+                                        >文章 /blog</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/thoughts"
+                                        class="text-gray-300 hover:text-white transition-colors"
+                                        >随笔 /thoughts</a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/tools"
+                                        class="text-gray-300 hover:text-white transition-colors"
+                                        >工具 /tools</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">我的其他网站</h3>
+                            <ul class="space-y-2">
+                                <li>
+                                    <a
+                                        href="https://github.com/fwindpeak"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="text-gray-300 hover:text-white transition-colors"
+                                        >GitHub <span
+                                            class="text-xs ml-1 opacity-50"
+                                            >↗</span
+                                        ></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-12 text-center text-gray-400 text-sm">
+                        版权所有 © {new Date().getFullYear()} GK Blog. 基于 Astro
+                        构建。
+                    </div>
+                </div>
+            </footer>
+
+            <script>
+                import mediumZoom from "medium-zoom";
+
+                // Mobile menu toggle logic
+                document.addEventListener("DOMContentLoaded", () => {
+                    // Initialize image zoom
+                    mediumZoom(".zoomable-image", {
+                        margin: 32,
+                        background: "rgba(0, 0, 0, 0.85)",
+                    });
+
+                    const button =
+                        document.getElementById("mobile-menu-button");
+                    const menu = document.getElementById("mobile-menu");
+                    const iconOpen = document.getElementById("menu-icon-open");
+                    const iconClose =
+                        document.getElementById("menu-icon-close");
+
+                    if (button && menu && iconOpen && iconClose) {
+                        button.addEventListener("click", () => {
+                            menu.classList.toggle("hidden");
+                            iconOpen.classList.toggle("hidden");
+                            iconOpen.classList.toggle("inline-flex");
+                            iconClose.classList.toggle("hidden");
+                            iconClose.classList.toggle("inline-flex");
+                        });
+                    }
+
+                    // Page view tracking
+                    try {
+                        fetch("/api/track", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                path: window.location.pathname,
+                            }),
+                        });
+                    } catch (e) {
+                        console.error("Tracking failed", e);
+                    }
                 });
-
-                const button = document.getElementById('mobile-menu-button');
-                const menu = document.getElementById('mobile-menu');
-                const iconOpen = document.getElementById('menu-icon-open');
-                const iconClose = document.getElementById('menu-icon-close');
-
-                if (button && menu && iconOpen && iconClose) {
-                    button.addEventListener('click', () => {
-                        menu.classList.toggle('hidden');
-                        iconOpen.classList.toggle('hidden');
-                        iconOpen.classList.toggle('inline-flex');
-                        iconClose.classList.toggle('hidden');
-                        iconClose.classList.toggle('inline-flex');
-                    });
-                }
-
-                // Page view tracking
-                try {
-                    fetch('/api/track', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ path: window.location.pathname })
-                    });
-                } catch (e) {
-                    console.error('Tracking failed', e);
-                }
-            });
-        </script>
-	</body>
+            </script>
+        </nav>
+    </body>
 </html>

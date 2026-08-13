@@ -25,6 +25,44 @@ const { id, type, initialLikes = 0 } = Astro.props;
   // Use relative URL so it works on any domain and port
   const serverUrl = '';
 
+  // 动态获取最新的点赞数
+  const fetchLikes = async () => {
+    const typeMap = new Map();
+    buttons.forEach(btn => {
+      const type = btn.getAttribute('data-type');
+      const id = btn.getAttribute('data-id');
+      if (type && id) {
+        if (!typeMap.has(type)) typeMap.set(type, new Set());
+        typeMap.get(type).add(id);
+      }
+    });
+
+    for (const [type, idsSet] of typeMap.entries()) {
+      const ids = Array.from(idsSet).join(',');
+      if (!ids) continue;
+      try {
+        const res = await fetch(`${serverUrl}/api/likes?type=${type}&ids=${ids}`);
+        if (!res.ok) continue;
+        const likesMap = await res.json();
+        
+        buttons.forEach(btn => {
+          if (btn.getAttribute('data-type') === type) {
+            const id = btn.getAttribute('data-id');
+            if (id && likesMap[id] !== undefined) {
+              const countSpan = btn.querySelector('.like-count');
+              if (countSpan) countSpan.textContent = likesMap[id].toString();
+            }
+          }
+        });
+      } catch (e) {
+        console.error('Failed to fetch likes:', e);
+      }
+    }
+  };
+
+  // 页面加载时获取最新点赞数
+  fetchLikes();
+
   buttons.forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = btn.getAttribute('data-id');
