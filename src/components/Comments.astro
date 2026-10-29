@@ -10,33 +10,33 @@ const { id, type } = Astro.props;
 
 <comment-widget data-id={id} data-type={type} class="block">
   <details class="group">
-    <summary class="cursor-pointer font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-4 hover:text-gray-900 dark:hover:text-white transition-colors outline-none select-none">
-      <span class="text-sm">讨论区</span>
-      <span class="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-gray-500 comment-count">0</span>
+    <summary class="cursor-pointer font-medium text-slate-800 dark:text-zinc-200 flex items-center gap-2 mb-4 hover:text-slate-600 dark:hover:text-zinc-300 transition-colors outline-none select-none">
+      <span class="text-sm font-semibold">讨论与留言</span>
+      <span class="text-xs bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full text-slate-600 dark:text-zinc-300 font-mono comment-count">0</span>
     </summary>
     
-    <div class="mt-4">
+    <div class="mt-4 space-y-6">
       <!-- 评论列表 -->
-      <div class="comments-list space-y-4 mb-6">
-        <p class="text-gray-400 text-sm italic">正在加载...</p>
+      <div class="comments-list space-y-4">
+        <p class="text-slate-400 dark:text-zinc-500 text-xs italic">正在载入讨论...</p>
       </div>
 
       <!-- 评论表单 -->
-      <div class="comment-form bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl">
+      <div class="comment-form bg-slate-50 dark:bg-zinc-900/60 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-zinc-800">
         <div class="space-y-3">
           <input 
             type="text" 
-            class="comment-author w-full px-3 py-2 text-sm bg-white dark:bg-[#1b1b1d] border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-white"
-            placeholder="你的昵称 (选填)" 
+            class="comment-author w-full px-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:border-slate-400 dark:focus:border-zinc-500 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500"
+            placeholder="你的昵称（选填）" 
           />
           <textarea 
-            class="comment-content w-full px-3 py-2 text-sm bg-white dark:bg-[#1b1b1d] border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 dark:text-white"
-            rows="2" 
-            placeholder="说点什么吧..." 
+            class="comment-content w-full px-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:border-slate-400 dark:focus:border-zinc-500 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500"
+            rows="3" 
+            placeholder="写下你的想法或讨论..." 
           ></textarea>
           <div class="flex justify-end">
-            <button class="submit-comment px-4 py-1.5 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 text-sm rounded-lg hover:bg-slate-700 dark:hover:bg-white transition-colors font-medium disabled:opacity-50">
-              发布
+            <button class="submit-comment px-4 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-zinc-100 transition-colors cursor-pointer disabled:opacity-50">
+              发送
             </button>
           </div>
         </div>
@@ -66,21 +66,21 @@ const { id, type } = Astro.props;
           if (countBadge) countBadge.textContent = comments.length.toString();
 
           if (comments.length === 0) {
-            list!.innerHTML = '<p class="text-gray-400 text-sm italic">暂无评论，快来抢沙发吧！</p>';
+            list!.innerHTML = '<p class="text-slate-400 dark:text-zinc-500 text-xs italic">暂无留言，欢迎留下第一条评论。</p>';
             return;
           }
 
           list!.innerHTML = comments.map((c: any) => `
-            <div class="comment-item text-sm">
+            <div class="comment-item text-sm border-b border-slate-100 dark:border-zinc-800 pb-3 last:border-b-0">
               <div class="flex items-center gap-2 mb-1">
-                <span class="font-bold text-gray-800 dark:text-gray-200">${c.author}</span>
-                <span class="text-xs text-gray-400">${formatDateTime(c.created_at)}</span>
+                <span class="font-semibold text-slate-900 dark:text-white">${c.author}</span>
+                <span class="text-xs text-slate-400 dark:text-zinc-500 font-mono">${formatDateTime(c.created_at)}</span>
               </div>
-              <p class="text-gray-600 dark:text-gray-400">${c.content}</p>
+              <p class="text-slate-700 dark:text-zinc-300 leading-relaxed">${c.content}</p>
             </div>
           `).join('');
         } catch (e) {
-          list!.innerHTML = '<p class="text-red-400 text-sm">加载评论失败</p>';
+          list!.innerHTML = '<p class="text-red-400 text-xs">加载评论失败</p>';
         }
       };
 
@@ -88,7 +88,7 @@ const { id, type } = Astro.props;
 
       if (submitBtn) {
         submitBtn.addEventListener('click', async () => {
-          const author = authorInput.value.trim() || '匿名';
+          const author = authorInput.value.trim() || '匿名读者';
           const content = contentInput.value.trim();
 
           if (!content) {
@@ -97,32 +97,36 @@ const { id, type } = Astro.props;
           }
 
           submitBtn.disabled = true;
-          submitBtn.innerText = '提交中...';
+          submitBtn.innerText = '发送中...';
 
           try {
-            const res = await fetch(`/api/comment`, {
+            const res = await fetch('/api/comment', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ type, id, author, content })
+              body: JSON.stringify({
+                author,
+                content,
+                target_id: id,
+                target_type: type,
+              }),
             });
 
             if (res.ok) {
               contentInput.value = '';
               loadComments();
+            } else {
+              alert('提交失败，请重试');
             }
           } catch (e) {
-            alert('提交失败');
+            alert('网络异常');
           } finally {
             submitBtn.disabled = false;
-            submitBtn.innerText = '发布';
+            submitBtn.innerText = '发送';
           }
         });
       }
     }
   }
 
-  // Prevent defining multiple times during HMR
-  if (!customElements.get('comment-widget')) {
-    customElements.define('comment-widget', CommentWidget);
-  }
+  customElements.define('comment-widget', CommentWidget);
 </script>

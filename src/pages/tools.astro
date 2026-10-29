@@ -175,25 +175,16 @@ const categories = [
 ];
 ---
 
-<Layout title="工具 - 工坊">
-    <div class="animate-in fade-in slide-in-from-bottom-3 duration-500 relative z-10 w-full py-2 sm:py-4">
+<Layout title="工坊与工具">
+    <div class="space-y-8">
         <!-- 头部标题区 -->
-        <header class="mb-10 sm:mb-12">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-black/[0.05] dark:border-white/[0.06]">
-                <div>
-                    <div class="flex items-center gap-3">
-                        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white m-0">
-                            数字工坊
-                        </h1>
-                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-black/[0.04] dark:bg-white/[0.06] text-gray-500 dark:text-gray-400 font-mono">
-                            {tools.length} 个作品
-                        </span>
-                    </div>
-                    <p class="mt-2 text-base sm:text-lg text-gray-500 dark:text-gray-400 font-normal">
-                        独立开发、业余折腾与极客玩具，皆可在浏览器中即开即用。
-                    </p>
-                </div>
-            </div>
+        <header class="border-b border-slate-200/80 dark:border-zinc-800 pb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
+                工坊与工具
+            </h1>
+            <p class="text-sm text-slate-500 dark:text-zinc-400">
+                独立开发、实验性探索与影像计算工具，浏览器中即开即用。共 {tools.length} 个作品。
+            </p>
 
             <!-- 分类筛选器 -->
             <div class="mt-6 flex flex-wrap gap-2" id="category-filter">
@@ -201,10 +192,10 @@ const categories = [
                     <button
                         type="button"
                         data-category={cat.key}
-                        class={`filter-btn px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer ${
+                        class={`filter-btn px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
                             idx === 0
                                 ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
-                                : 'bg-black/[0.03] text-gray-600 hover:text-gray-900 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:text-white hover:bg-black/[0.06] dark:hover:bg-white/[0.09]'
+                                : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-zinc-700'
                         }`}
                     >
                         {cat.label}
@@ -214,60 +205,51 @@ const categories = [
         </header>
 
         <!-- 工具网格列表 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6" id="tools-grid">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5" id="tools-grid">
             {tools.map((tool, index) => (
                 <div
                     data-category={tool.category}
-                    class="tool-card group bg-white dark:bg-[#1c1c20] rounded-2xl p-6 sm:p-7 border border-black/[0.05] dark:border-white/[0.06] shadow-[0_2px_12px_-2px_rgba(0,0,0,0.03),0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.05),0_2px_6px_rgba(0,0,0,0.02)] hover:border-black/[0.08] dark:hover:border-white/[0.1] transition-all duration-300 flex flex-col justify-between"
+                    class="tool-card group p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-zinc-800 bg-slate-50/40 hover:bg-white dark:bg-zinc-900/40 dark:hover:bg-zinc-900/80 hover:border-slate-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between"
                 >
-                    <div>
-                        <!-- 卡片顶部：图标与编号/分类 -->
-                        <div class="flex items-start justify-between gap-3 mb-4">
-                            <div class="w-13 h-13 rounded-2xl bg-black/[0.025] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
-                                {tool.icon}
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-black/[0.03] dark:bg-white/[0.05] text-gray-500 dark:text-gray-400">
-                                    {tool.categoryLabel}
-                                </span>
-                                <span class="text-[11px] font-mono text-gray-300 dark:text-zinc-600">
-                                    #{String(index + 1).padStart(2, '0')}
-                                </span>
-                            </div>
+                    <div class="space-y-3">
+                        <!-- 卡片顶部 -->
+                        <div class="flex items-center justify-between gap-3 text-xs font-mono">
+                            <span class="text-slate-400 dark:text-zinc-500">
+                                #{String(index + 1).padStart(2, '0')}
+                            </span>
+                            <span class="text-xs font-medium text-slate-500 dark:text-zinc-400">
+                                {tool.categoryLabel}
+                            </span>
                         </div>
 
                         <!-- 标题与英文名 -->
-                        <div class="mb-2.5">
-                            <h2 class="text-lg sm:text-[19px] font-bold text-gray-900 dark:text-white group-hover:text-[#25c2a0] transition-colors leading-snug">
-                                <a href={tool.url} target="_blank" rel="noopener noreferrer" class="hover:underline">
+                        <div>
+                            <h2 class="text-base sm:text-lg font-semibold text-slate-900 dark:text-white leading-snug">
+                                <a href={tool.url} target="_blank" rel="noopener noreferrer" class="no-underline hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                                     {tool.title}
                                 </a>
                             </h2>
-                            <span class="text-xs font-mono text-gray-400 dark:text-zinc-500 block mt-0.5">
+                            <span class="text-xs font-mono text-slate-400 dark:text-zinc-500 block mt-0.5">
                                 {tool.name}
                             </span>
                         </div>
 
                         <!-- 描述 -->
-                        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-normal mb-6">
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
                             {tool.description}
                         </p>
                     </div>
 
                     <!-- 底部操作与链接 -->
-                    <div class="pt-4 border-t border-black/[0.04] dark:border-white/[0.04] flex items-center justify-between text-xs">
+                    <div class="pt-4 mt-3 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between text-xs">
                         {tool.github ? (
                             <a
                                 href={tool.github}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="flex items-center gap-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-                                title="查看 GitHub 源代码"
+                                class="text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 transition-colors inline-flex items-center gap-1 no-underline font-mono"
                             >
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                                </svg>
-                                <span>源码</span>
+                                Source ↗
                             </a>
                         ) : <span />}
 
@@ -275,7 +257,7 @@ const categories = [
                             href={tool.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-black/[0.04] hover:bg-[#25c2a0] hover:text-white dark:bg-white/[0.06] dark:hover:bg-[#25c2a0] dark:hover:text-white text-gray-700 dark:text-gray-300 font-medium transition-all duration-200 cursor-pointer group-hover:bg-[#25c2a0] group-hover:text-white shadow-xs"
+                            class="inline-flex items-center gap-1 text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 transition-colors no-underline font-medium"
                         >
                             <span>启动体验</span>
                             <span class="text-xs transition-transform group-hover:translate-x-0.5">↗</span>
@@ -299,18 +281,15 @@ const categories = [
                 btn.addEventListener('click', () => {
                     const category = btn.getAttribute('data-category');
 
-                    // 切换按钮高亮样式
                     buttons.forEach(b => {
-                        b.className = 'filter-btn px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer bg-black/[0.03] text-gray-600 hover:text-gray-900 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:text-white hover:bg-black/[0.06] dark:hover:bg-white/[0.09]';
+                        b.className = 'filter-btn px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-zinc-700';
                     });
-                    btn.className = 'filter-btn px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs';
+                    btn.className = 'filter-btn px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs';
 
-                    // 过滤卡片
                     cards.forEach(card => {
                         const cardCat = card.getAttribute('data-category');
                         if (category === 'all' || cardCat === category) {
                             card.style.display = 'flex';
-                            card.classList.add('animate-in', 'fade-in', 'duration-300');
                         } else {
                             card.style.display = 'none';
                         }

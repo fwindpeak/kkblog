@@ -1,125 +1,180 @@
- body {
-     background-color: #ffffff;
-     color: #1c1e21; /* Docusaurus default text color */
-     font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-     -webkit-font-smoothing: antialiased;
-     font-size: 1.125rem; /* 18px base for better readability */
-     line-height: 1.8; /* Relaxed line height */
-     letter-spacing: 0.01em; /* Slight letter spacing for Chinese/English mixed text */
- }
+/* Modern Clean Typography & Theme Tokens */
+:root {
+    --bg-primary: #ffffff;
+    --bg-surface: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --selection-bg: #e0f2fe;
+    --accent: #0284c7;
+}
 
- /* Dark mode support (optional baseline) */
- @media (prefers-color-scheme: dark) {
-    body {
-        background-color: #1b1b1d;
-        color: #f5f6f7;
+.dark {
+    --bg-primary: #09090b;
+    --bg-surface: #18181b;
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --border-color: #27272a;
+    --selection-bg: #1e293b;
+    --accent: #38bdf8;
+}
+
+/* Fallback for system preference when class is not explicitly set */
+@media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+        --bg-primary: #09090b;
+        --bg-surface: #18181b;
+        --text-primary: #fafafa;
+        --text-secondary: #a1a1aa;
+        --border-color: #27272a;
+        --selection-bg: #1e293b;
+        --accent: #38bdf8;
     }
- }
+}
 
- /* Typography for Markdown Preview */
- .prose h1 {
-     font-size: 2.25em;
-     font-weight: 700;
-     margin-bottom: 0.5em;
-     color: inherit;
-     line-height: 1.2;
- }
+html {
+    scroll-behavior: smooth;
+    overflow-y: scroll;
+}
 
- .prose h2 {
-     font-size: 1.75em;
-     font-weight: 600;
-     margin-top: 1.5em;
-     margin-bottom: 0.75em;
-     color: inherit;
-     line-height: 1.25;
- }
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 1rem;
+    line-height: 1.75;
+    letter-spacing: normal;
+    text-wrap: pretty;
+    word-break: break-word;
+}
 
- .prose h3 {
-     font-size: 1.25em;
-     font-weight: 600;
-     margin-top: 1.25em;
-     margin-bottom: 0.5em;
-     color: inherit;
- }
+/* Crafted Selection */
+::selection {
+    background-color: var(--selection-bg);
+    color: inherit;
+}
 
- .prose p {
-     margin-bottom: 1.6em; /* Increased from 1.25em for better breathing room */
-     line-height: 1.8; /* Increased for readability */
- }
+/* Chinese Editorial & Article Typography */
+.prose {
+    max-width: 68ch;
+    font-size: 1.0625rem;
+    line-height: 1.8;
+}
 
- .prose ul {
-     list-style-type: disc;
-     padding-left: 1.5em;
-     margin-bottom: 1.6em;
-     line-height: 1.8;
- }
+.prose h1, .prose h2, .prose h3, .prose h4 {
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+}
 
- .prose li {
-     margin-bottom: 0.25em;
- }
+.prose h1 {
+    font-size: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 1.25rem;
+}
 
- .prose a {
-     color: #25c2a0; /* Docusaurus default green-ish or classic blue */
-     text-decoration: none;
- }
- .prose a:hover {
-     text-decoration: underline;
- }
+.prose h2 {
+    font-size: 1.5rem;
+    margin-top: 2.25rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--border-color);
+}
 
- @media (prefers-color-scheme: dark) {
-     .prose a {
-         color: #25c2a0;
-     }
- }
+.prose h3 {
+    font-size: 1.25rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.75rem;
+}
 
- .prose blockquote {
-     border-left: 4px solid #25c2a0;
-     padding-left: 1em;
-     margin: 1.5em 0;
-     font-style: italic;
-     color: #606770;
-     background: rgba(37, 194, 160, 0.1);
-     padding: 1em;
-     border-radius: 0 4px 4px 0;
- }
+.prose p {
+    margin-bottom: 1.5em;
+    color: var(--text-primary);
+    text-align: justify;
+}
 
- @media (prefers-color-scheme: dark) {
-     .prose blockquote {
-         color: #aeb3b9;
-     }
- }
+.prose ul, .prose ol {
+    margin-bottom: 1.5em;
+    padding-left: 1.5em;
+}
 
- .prose code {
-     background-color: rgba(0, 0, 0, 0.05);
-     padding: 0.2em 0.4em;
-     border-radius: 4px;
-     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-     font-size: 0.85em;
-     border: 1px solid rgba(0, 0, 0, 0.1);
- }
+.prose ul {
+    list-style-type: disc;
+}
 
- @media (prefers-color-scheme: dark) {
-     .prose code {
-         background-color: rgba(255, 255, 255, 0.05);
-         border-color: rgba(255, 255, 255, 0.1);
-     }
- }
+.prose ol {
+    list-style-type: decimal;
+}
 
- .prose img {
-     max-width: 100%;
-     border-radius: 8px;
-     margin: 1.5em 0;
- }
+.prose li {
+    margin-bottom: 0.35em;
+}
 
- button {
-     cursor: pointer;
- }
+.prose a {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--border-color);
+    transition: text-decoration-color 0.15s ease, color 0.15s ease;
+}
 
- /* Override medium-zoom z-index to ensure it sits above the navigation bar (z-50) and content containers (z-10) */
- .medium-zoom-overlay,
- .medium-zoom-overlay ~ .medium-zoom-image {
-   z-index: 9999 !important;
- }
- .medium-zoom-image--opened {
-   z-index: 10000 !important;
- }
+.prose a:hover {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+}
+
+/* Subtle, refined blockquote */
+.prose blockquote {
+    border-left: 2px solid var(--border-color);
+    padding-left: 1rem;
+    margin: 1.75rem 0;
+    color: var(--text-secondary);
+    background: transparent;
+    font-style: normal;
+}
+
+.prose blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+.prose code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.875em;
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    padding: 0.18em 0.38em;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.prose pre {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin: 1.75rem 0;
+}
+
+.prose pre code {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.875rem;
+    line-height: 1.65;
+}
+
+.prose hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 2.5rem 0;
+}
+
+.prose img {
+    border-radius: 8px;
+    margin: 1.75rem auto;
+    border: 1px solid var(--border-color);
+}

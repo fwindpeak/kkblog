@@ -1,48 +1,185 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { db } from '../lib/db';
+
+export const prerender = false;
+
+// Query latest articles and thoughts directly
+const recentPosts = db.query(
+    "SELECT id, title, slug, created_at, read_time, excerpt FROM posts ORDER BY created_at DESC LIMIT 3"
+).all() as any[];
+
+const recentThought = db.query(
+    "SELECT id, content, created_at FROM thoughts ORDER BY created_at DESC LIMIT 1"
+).get() as any;
+
+const featuredTools = [
+    {
+        title: "索尼 ARW 胶片创意外观解锁器",
+        desc: "纯本地解析注入，使索尼相机 ARW 原始文件释放 FL2/FL3 原厂胶片色彩色彩科学。",
+        url: "https://fwindpeak.github.io/sony-arw-fl2-unlocker/",
+        tag: "影像摄影",
+    },
+    {
+        title: "LensMark 镜头光学质量评测",
+        desc: "基于浏览器端实拍样本快速量化分析镜头解析力、边缘锐度衰减与色散表现。",
+        url: "https://fwindpeak.github.io/LensMark/",
+        tag: "光学分析",
+    },
+];
 ---
 
 <Layout title="首页">
-    <article class="w-full">
-        <h2 id="welcome" class="text-3xl font-bold mb-6 mt-0">
-            GK Blog｜收集片刻，于静止与喧嚣之中
-        </h2>
-        
-        <p class="mb-8">
-            <img decoding="async" loading="lazy" src="/img/profile.png" width="160" height="160" class="rounded-xl shadow-sm mb-6" />
-            你好，我是 GK，欢迎你来到这里！这是我耕耘的一方天地，用于培育想法、设计系统，偶尔与人工智能对话。
-        </p>
+    <div class="space-y-16 md:space-y-20">
+        <!-- Hero Section: Clean, Crisp, Modern -->
+        <section class="pt-2">
+            <div class="flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-8">
+                <div class="max-w-xl space-y-3">
+                    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+                        收集片刻，<br class="hidden sm:inline" />于静止与喧嚣之中。
+                    </h1>
+                    <p class="text-base sm:text-lg text-slate-600 dark:text-zinc-300 leading-relaxed pt-1">
+                        你好，我是 <strong class="text-slate-900 dark:text-white font-semibold">GK</strong>。在系统工程、影像光学与人工智能之间穿梭，记录长期的技术思考、审美探索与碎片化的日常念头。
+                    </p>
+                </div>
+                <div class="shrink-0">
+                    <img
+                        src="/img/profile.png"
+                        alt="GK Profile"
+                        class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-1 ring-slate-200 dark:ring-zinc-700 shadow-sm"
+                    />
+                </div>
+            </div>
+        </section>
 
-        <h2 id="blog" class="text-2xl font-bold mt-12 mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
-            🌟 <a href="/blog" class="text-gray-900 dark:text-white hover:text-[#25c2a0] transition-colors no-underline">文章 <code>/blog</code></a>
-        </h2>
-        <p class="mb-6">
-            这里是我分享长篇思考和技术文章的地方。包含开发经验、系统设计，以及我对技术的深入探索。<strong>如果你是新读者，建议可以<a href="/blog" class="text-[#25c2a0] hover:underline">从这里开始探索</a>！</strong>
-        </p>
-        
-        <h2 id="other-pages" class="text-2xl font-bold mt-12 mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
-            🌈 其他页面
-        </h2>
-        <ul class="space-y-3 mb-6 list-disc pl-5">
-            <li><strong><a href="/thoughts" class="text-[#25c2a0] hover:underline">随笔 <code>/thoughts</code></a></strong> - 我近期的碎片化想法和状态记录。</li>
-            <li><strong><a href="/tools" class="text-[#25c2a0] hover:underline">工具 <code>/tools</code></a></strong> - 我收集和制作的各种实用小工具。</li>
-        </ul>
+        <!-- Selected Writing Section -->
+        <section class="space-y-4">
+            <div class="flex items-baseline justify-between border-b border-slate-200/80 dark:border-zinc-800 pb-3">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                    近期文章 / Writing
+                </h2>
+                <a
+                    href="/blog"
+                    class="text-xs text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors inline-flex items-center gap-1 font-medium"
+                >
+                    全部文章 <span>→</span>
+                </a>
+            </div>
 
-        <h2 id="projects" class="text-2xl font-bold mt-12 mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
-            🌐 我的其他网站
-        </h2>
-        <ul class="space-y-3 mb-6 list-disc pl-5">
-            <li><strong><a href="https://github.com/fwindpeak" target="_blank" rel="noopener noreferrer" class="text-[#25c2a0] hover:underline">GitHub</a></strong> - 我的开源项目和代码库。</li>
-        </ul>
-        
-        <div class="mt-12 p-6 bg-[rgba(37,194,160,0.1)] border-l-4 border-[#25c2a0] rounded-r-lg">
-            <h3 class="text-lg font-bold flex items-center gap-2 mb-2 text-[#1c1e21] dark:text-[#f5f6f7] mt-0">
-                <svg viewBox="0 0 12 16" width="16" height="16" fill="currentColor"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"/></svg>
-                联系我
-            </h3>
-            <p class="mb-0 text-[#1c1e21] dark:text-[#f5f6f7]">
-                欢迎浏览我的博客！如果有任何想法，欢迎通过 GitHub 等渠道与我交流。
-            </p>
-        </div>
-    </article>
+            {recentPosts.length > 0 ? (
+                <div class="divide-y divide-slate-100 dark:divide-zinc-800/80">
+                    {recentPosts.map((post) => (
+                        <article class="group py-5 first:pt-2 transition-all">
+                            <a href={`/blog/${post.slug}`} class="block no-underline space-y-1.5">
+                                <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                                    <h3 class="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                                        {post.title}
+                                    </h3>
+                                    <div class="shrink-0 text-xs font-mono text-slate-500 dark:text-zinc-400 flex items-center gap-2">
+                                        <time>{post.created_at ? post.created_at.slice(0, 10) : ""}</time>
+                                        <span>·</span>
+                                        <span>{post.read_time || "1"} 分钟阅读</span>
+                                    </div>
+                                </div>
+                                {post.excerpt && (
+                                    <p class="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed line-clamp-2">
+                                        {post.excerpt}
+                                    </p>
+                                )}
+                            </a>
+                        </article>
+                    ))}
+                </div>
+            ) : (
+                <p class="text-sm text-slate-500 py-4">暂无公开文章。</p>
+            )}
+        </section>
+
+        <!-- Selected Tools & Inventions -->
+        <section class="space-y-4">
+            <div class="flex items-baseline justify-between border-b border-slate-200/80 dark:border-zinc-800 pb-3">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                    作品与工具 / Tools
+                </h2>
+                <a
+                    href="/tools"
+                    class="text-xs text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors inline-flex items-center gap-1 font-medium"
+                >
+                    全部作品 <span>→</span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {featuredTools.map((tool) => (
+                    <a
+                        href={tool.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="group block p-5 rounded-xl border border-slate-200/80 dark:border-zinc-800 bg-slate-50/50 hover:bg-white dark:bg-zinc-900/40 dark:hover:bg-zinc-900/80 hover:border-slate-300 dark:hover:border-zinc-700 transition-all no-underline"
+                    >
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium text-slate-500 dark:text-zinc-400">
+                                {tool.tag}
+                            </span>
+                            <span class="text-xs text-slate-500 dark:text-zinc-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                                ↗
+                            </span>
+                        </div>
+                        <h3 class="text-base font-semibold text-slate-900 dark:text-white mb-1.5 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                            {tool.title}
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">
+                            {tool.desc}
+                        </p>
+                    </a>
+                ))}
+            </div>
+        </section>
+
+        <!-- Murmurs / Recent Thoughts -->
+        {recentThought && (
+            <section class="space-y-3">
+                <div class="flex items-baseline justify-between border-b border-slate-200/80 dark:border-zinc-800 pb-3">
+                    <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                        瞬息念头 / Thoughts
+                    </h2>
+                    <a
+                        href="/thoughts"
+                        class="text-xs text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors inline-flex items-center gap-1 font-medium"
+                    >
+                        全部随笔 <span>→</span>
+                    </a>
+                </div>
+                <div class="p-5 rounded-xl border border-slate-200/80 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/40">
+                    <p class="text-slate-800 dark:text-zinc-200 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                        “{recentThought.content.replace(/^[-#\s]+/gm, '').trim()}”
+                    </p>
+                    <div class="mt-3 text-xs font-mono text-slate-400 dark:text-zinc-500">
+                        {recentThought.created_at ? recentThought.created_at.slice(0, 16) : ""}
+                    </div>
+                </div>
+            </section>
+        )}
+
+        <!-- Colophon & Contact -->
+        <section class="pt-6 pb-2 border-t border-slate-200/80 dark:border-zinc-800">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-sm text-slate-600 dark:text-zinc-400">
+                <div>
+                    <p class="text-slate-900 dark:text-white font-medium">交流与连接</p>
+                    <p class="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">有任何有趣的讨论、项目或想法，欢迎交流。</p>
+                </div>
+                <div class="flex items-center gap-3 text-xs">
+                    <a
+                        href="https://github.com/fwindpeak"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors text-slate-800 dark:text-zinc-200 no-underline font-medium inline-flex items-center gap-1"
+                    >
+                        <span>GitHub</span>
+                        <span class="opacity-60 text-[10px]">↗</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
 </Layout>

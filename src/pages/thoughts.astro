@@ -1,22 +1,23 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import ThoughtsBoard from '../components/ThoughtsBoard.vue';
-import { marked } from '../lib/markedSetup';
-import { db } from '../lib/db';
+import Layout from "../layouts/Layout.astro";
+import ThoughtsBoard from "../components/ThoughtsBoard.vue";
+import { marked } from "../lib/markedSetup";
+import { db } from "../lib/db";
 
-// 移除 prerender 保证每次访问均从 SQLite 拉取最新数据
 export const prerender = false;
 
-const rawThoughts = db.query("SELECT * FROM thoughts ORDER BY created_at DESC").all();
+const rawThoughts = db
+    .query("SELECT * FROM thoughts ORDER BY created_at DESC")
+    .all();
 
-const processedThoughts = await Promise.all(rawThoughts.map(async (t: any) => ({
-    ...t,
-    html: await marked.parse(t.content)
-})));
+const processedThoughts = await Promise.all(
+    rawThoughts.map(async (t: any) => ({
+        ...t,
+        html: await marked.parse(t.content),
+    })),
+);
 ---
 
-<Layout title="随笔 - 瞬息念头">
-    <div class="animate-in fade-in slide-in-from-bottom-3 duration-500 relative z-10 w-full py-2 sm:py-4">
-        <ThoughtsBoard client:load initialThoughts={processedThoughts} />
-    </div>
+<Layout title="随笔与瞬息念头">
+    <ThoughtsBoard client:load initialThoughts={processedThoughts} />
 </Layout>
