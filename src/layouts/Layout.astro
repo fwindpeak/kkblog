@@ -121,13 +121,14 @@ const isActive = (path: string) => {
                     >
                 </div>
             </div>
+        </nav>
 
-            {/* Main Content Area */}
-            <main
-                class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 prose dark:prose-invert"
-            >
-                <slot />
-            </main>
+        {/* Main Content Area */}
+        <main
+            class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12"
+        >
+            <slot />
+        </main>
 
             {/* Footer */}
             <footer class="bg-[#1b1b1d] text-white py-12 mt-auto">
@@ -228,6 +229,5 @@ const isActive = (path: string) => {
                     }
                 });
             </script>
-        </nav>
     </body>
 </html>
