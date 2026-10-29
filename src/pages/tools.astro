@@ -1,71 +1,322 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const tools = [
+interface ToolItem {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  url: string;
+  github?: string;
+  icon: string;
+  category: 'imaging' | 'retro' | 'creative' | 'games';
+  categoryLabel: string;
+}
+
+const tools: ToolItem[] = [
+  // 摄影与影像
   {
+    id: "sony-arw-fl2",
+    name: "sony-arw-fl2-unlocker",
+    title: "索尼 ARW 胶片创意外观解锁器",
+    description: "纯浏览器本地解析与注入工具，让索尼 A7C2 / A7M4 等相机的 ARW 原始文件解锁原厂 FL2 / FL3 怀旧电影胶片创意外观。",
+    url: "https://fwindpeak.github.io/sony-arw-fl2-unlocker/",
+    github: "https://github.com/fwindpeak/sony-arw-fl2-unlocker",
+    icon: "🎞️",
+    category: "imaging",
+    categoryLabel: "影像摄影"
+  },
+  {
+    id: "lensmark",
+    name: "LensMark",
+    title: "镜头光学成像质量评测",
+    description: "纯浏览器端通过实拍照片快速评估相机镜头中心与边缘的分辨率表现、锐度曲线与光学色散。",
+    url: "https://fwindpeak.github.io/LensMark/",
+    github: "https://github.com/fwindpeak/LensMark",
+    icon: "🔬",
+    category: "imaging",
+    categoryLabel: "影像摄影"
+  },
+  {
+    id: "sony-fe-lens-db",
+    name: "sony-fe-lens-db",
+    title: "索尼 FE 全画幅镜头数据库",
+    description: "索尼 E 卡口全画幅镜头全维度数据查询与规格对比，涵盖焦段、光圈、重量、光学结构与画质评定。",
+    url: "https://fwindpeak.github.io/sony-fe-lens-db/",
+    github: "https://github.com/fwindpeak/sony-fe-lens-db",
+    icon: "📷",
+    category: "imaging",
+    categoryLabel: "影像摄影"
+  },
+  {
+    id: "lutcut",
     name: "lutcut",
-    description: "纯浏览器的本地视频剪辑工具，可以套lut导出",
+    title: "本地视频剪辑与 3D-LUT 调色",
+    description: "基于 Web 的纯本地视频轻量剪辑与调色导出工具，无需上传云端保护隐私，支持套用 3D LUT 滤镜即时预览导出。",
     url: "https://fwindpeak.github.io/lutcut/",
-    icon: "🎬"
+    github: "https://github.com/fwindpeak/lutcut",
+    icon: "🎬",
+    category: "imaging",
+    categoryLabel: "影像摄影"
   },
+
+  // 复古计算
   {
-    name: "NC2000-wasm",
-    description: "文曲星NC2000系列模拟器，浏览器版",
-    url: "https://fwindpeak.github.io/NC2000-wasm/",
-    icon: "📟"
-  },
-  {
+    id: "lavstudio",
     name: "LavStudio",
-    description: "网页版LavaX编译、反编译、编辑器",
+    title: "网页版 LavaX IDE 与编辑器",
+    description: "文曲星经典开发语言 LavaX 的现代 Web 集成开发环境，支持在线代码编写、一键编译、反编译与高亮预览。",
     url: "https://fwindpeak.github.io/LavStudio/",
-    icon: "💻"
+    github: "https://github.com/fwindpeak/LavStudio",
+    icon: "💻",
+    category: "retro",
+    categoryLabel: "复古计算"
   },
   {
+    id: "nc2000-wasm",
+    name: "NC2000-wasm",
+    title: "文曲星 NC2000 网页版模拟器",
+    description: "采用 WebAssembly 技术在现代浏览器中高保真模拟经典文曲星 NC2000 电子词典，重温童年黑白点阵情怀。",
+    url: "https://fwindpeak.github.io/NC2000-wasm/",
+    github: "https://github.com/fwindpeak/NC2000-wasm",
+    icon: "📟",
+    category: "retro",
+    categoryLabel: "复古计算"
+  },
+
+  // 创意视觉
+  {
+    id: "wordcloud",
+    name: "wordcloud-demo",
+    title: "纯前端词云图片生成器",
+    description: "零后端依赖的文字词云艺术图片生成工具，支持自定义形状蒙版、词频权重分配、定制配色与高清图片导出。",
+    url: "https://word.pages.dev",
+    github: "https://github.com/fwindpeak/wordcloud-demo",
+    icon: "☁️",
+    category: "creative",
+    categoryLabel: "创意视觉"
+  },
+  {
+    id: "ar-model-viewer",
+    name: "ar-model-viewer",
+    title: "3D / AR 虚拟模型查看器",
+    description: "基于 WebXR 与 model-viewer 技术的 3D 物品渲染与增强现实查看器，可在手机端直接开启相机把 3D 模型放进现实。",
+    url: "https://fwindpeak.github.io/ar-model-viewer/",
+    github: "https://github.com/fwindpeak/ar-model-viewer",
+    icon: "🥽",
+    category: "creative",
+    categoryLabel: "创意视觉"
+  },
+  {
+    id: "baidu-pano",
+    name: "BaiduPanoDownload",
+    title: "百度街景全景图抓取与拼接",
+    description: "用于获取与自动拼合百度街景高清 360° 全景图的辅助工具，方便空间环境分析与建筑景观参考。",
+    url: "https://fwindpeak.github.io/BaiduPanoDownload/",
+    github: "https://github.com/fwindpeak/BaiduPanoDownload",
+    icon: "🌐",
+    category: "creative",
+    categoryLabel: "创意视觉"
+  },
+  {
+    id: "vibe-cocktail",
     name: "vibe-cocktail",
-    description: "情绪调酒模拟器",
+    title: "情绪调酒模拟器",
+    description: "结合情绪感知的趣味调酒模拟小品，用灵感色彩与微醺文字调制专属于当下心境的数字鸡尾酒。",
     url: "https://fwindpeak.github.io/vibe-cocktail/",
-    icon: "🍸"
+    github: "https://github.com/fwindpeak/vibe-cocktail",
+    icon: "🍸",
+    category: "creative",
+    categoryLabel: "创意视觉"
   },
+
+  // 游戏与VR
   {
+    id: "applab",
     name: "applab",
-    description: "Oculus Quest Applab page.",
+    title: "Oculus Quest App Lab 导航",
+    description: "整理收录非官方主商店的优质 Meta Quest 独立 VR 应用与实验性项目，提供便捷分类筛选与直达通道。",
     url: "https://fwindpeak.github.io/applab/",
-    icon: "🥽"
+    github: "https://github.com/fwindpeak/applab",
+    icon: "🕶️",
+    category: "games",
+    categoryLabel: "游戏与VR"
   },
   {
+    id: "quest-store-query",
+    name: "oculus-quest-store-query",
+    title: "Quest 商店折扣动态查询",
+    description: "实时跟踪与查询 Meta Quest 官方商店的游戏特惠打折信息，获取第一手降价动态与历史价格参考。",
+    url: "https://fwindpeak.github.io/oculus-quest-store-query/",
+    github: "https://github.com/fwindpeak/oculus-quest-store-query",
+    icon: "🏷️",
+    category: "games",
+    categoryLabel: "游戏与VR"
+  },
+  {
+    id: "vite-tetris",
     name: "vite-tetris",
-    description: "Use React, Redux, Immutable to code Tetris. 🎮 Build with vite.",
+    title: "复古掌机俄罗斯方块",
+    description: "基于 React、Redux、Immutable 与 Vite 构建的复古像素掌机俄罗斯方块，还原经典声效与纯粹手感。",
     url: "https://fwindpeak.github.io/vite-tetris/",
-    icon: "🎮"
+    github: "https://github.com/fwindpeak/vite-tetris",
+    icon: "🕹️",
+    category: "games",
+    categoryLabel: "游戏与VR"
   }
+];
+
+const categories = [
+  { key: 'all', label: '全部项目' },
+  { key: 'imaging', label: '影像摄影' },
+  { key: 'retro', label: '复古计算' },
+  { key: 'creative', label: '创意视觉' },
+  { key: 'games', label: '游戏与VR' },
 ];
 ---
 
-<Layout title="工具">
-    <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative z-10">
-        <header class="flex items-baseline justify-between border-b border-slate-300 pb-4">
-            <h2 class="text-3xl font-serif text-slate-900">工坊</h2>
-            <span class="font-mono text-xs text-slate-400 tracking-wider">V1.0.4</span>
-        </header>
-        
-        <div class="grid md:grid-cols-2 gap-6">
-            {tools.map((tool, index) => (
-                <a href={tool.url} target="_blank" rel="noopener noreferrer" class="group relative bg-slate-100 rounded-lg p-6 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-colors block cursor-pointer">
-                    <div class="absolute top-4 right-4 text-xs font-mono text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">
-                        UTIL-{String(index + 1).padStart(2, '0')}
+<Layout title="工具 - 工坊">
+    <div class="animate-in fade-in slide-in-from-bottom-3 duration-500 relative z-10 w-full py-2 sm:py-4">
+        <!-- 头部标题区 -->
+        <header class="mb-10 sm:mb-12">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-black/[0.05] dark:border-white/[0.06]">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white m-0">
+                            数字工坊
+                        </h1>
+                        <span class="px-2.5 py-0.5 text-xs font-medium rounded-full bg-black/[0.04] dark:bg-white/[0.06] text-gray-500 dark:text-gray-400 font-mono">
+                            {tools.length} 个作品
+                        </span>
                     </div>
-                    <div class="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center mb-4 text-xl">
-                        {tool.icon}
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-900 font-sans mb-2">{tool.name}</h3>
-                    <p class="text-sm text-slate-500 mb-6 font-serif leading-relaxed line-clamp-2 min-h-[2.5rem]">
-                        {tool.description}
+                    <p class="mt-2 text-base sm:text-lg text-gray-500 dark:text-gray-400 font-normal">
+                        独立开发、业余折腾与极客玩具，皆可在浏览器中即开即用。
                     </p>
-                    <div class="w-full py-2 bg-white border border-slate-300 rounded font-mono text-xs text-slate-900 uppercase tracking-widest text-center group-hover:bg-slate-900 group-hover:text-white transition-colors shadow-sm">
-                        启动
+                </div>
+            </div>
+
+            <!-- 分类筛选器 -->
+            <div class="mt-6 flex flex-wrap gap-2" id="category-filter">
+                {categories.map((cat, idx) => (
+                    <button
+                        type="button"
+                        data-category={cat.key}
+                        class={`filter-btn px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer ${
+                            idx === 0
+                                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                                : 'bg-black/[0.03] text-gray-600 hover:text-gray-900 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:text-white hover:bg-black/[0.06] dark:hover:bg-white/[0.09]'
+                        }`}
+                    >
+                        {cat.label}
+                    </button>
+                ))}
+            </div>
+        </header>
+
+        <!-- 工具网格列表 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6" id="tools-grid">
+            {tools.map((tool, index) => (
+                <div
+                    data-category={tool.category}
+                    class="tool-card group bg-white dark:bg-[#1c1c20] rounded-2xl p-6 sm:p-7 border border-black/[0.05] dark:border-white/[0.06] shadow-[0_2px_12px_-2px_rgba(0,0,0,0.03),0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.05),0_2px_6px_rgba(0,0,0,0.02)] hover:border-black/[0.08] dark:hover:border-white/[0.1] transition-all duration-300 flex flex-col justify-between"
+                >
+                    <div>
+                        <!-- 卡片顶部：图标与编号/分类 -->
+                        <div class="flex items-start justify-between gap-3 mb-4">
+                            <div class="w-13 h-13 rounded-2xl bg-black/[0.025] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
+                                {tool.icon}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-black/[0.03] dark:bg-white/[0.05] text-gray-500 dark:text-gray-400">
+                                    {tool.categoryLabel}
+                                </span>
+                                <span class="text-[11px] font-mono text-gray-300 dark:text-zinc-600">
+                                    #{String(index + 1).padStart(2, '0')}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 标题与英文名 -->
+                        <div class="mb-2.5">
+                            <h2 class="text-lg sm:text-[19px] font-bold text-gray-900 dark:text-white group-hover:text-[#25c2a0] transition-colors leading-snug">
+                                <a href={tool.url} target="_blank" rel="noopener noreferrer" class="hover:underline">
+                                    {tool.title}
+                                </a>
+                            </h2>
+                            <span class="text-xs font-mono text-gray-400 dark:text-zinc-500 block mt-0.5">
+                                {tool.name}
+                            </span>
+                        </div>
+
+                        <!-- 描述 -->
+                        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-normal mb-6">
+                            {tool.description}
+                        </p>
                     </div>
-                </a>
+
+                    <!-- 底部操作与链接 -->
+                    <div class="pt-4 border-t border-black/[0.04] dark:border-white/[0.04] flex items-center justify-between text-xs">
+                        {tool.github ? (
+                            <a
+                                href={tool.github}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center gap-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                                title="查看 GitHub 源代码"
+                            >
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                                </svg>
+                                <span>源码</span>
+                            </a>
+                        ) : <span />}
+
+                        <a
+                            href={tool.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-black/[0.04] hover:bg-[#25c2a0] hover:text-white dark:bg-white/[0.06] dark:hover:bg-[#25c2a0] dark:hover:text-white text-gray-700 dark:text-gray-300 font-medium transition-all duration-200 cursor-pointer group-hover:bg-[#25c2a0] group-hover:text-white shadow-xs"
+                        >
+                            <span>启动体验</span>
+                            <span class="text-xs transition-transform group-hover:translate-x-0.5">↗</span>
+                        </a>
+                    </div>
+                </div>
             ))}
         </div>
     </div>
+
+    <!-- 客户端分类筛选脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterContainer = document.getElementById('category-filter');
+            const cards = document.querySelectorAll<HTMLElement>('.tool-card');
+            if (!filterContainer) return;
+
+            const buttons = filterContainer.querySelectorAll<HTMLButtonElement>('.filter-btn');
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.getAttribute('data-category');
+
+                    // 切换按钮高亮样式
+                    buttons.forEach(b => {
+                        b.className = 'filter-btn px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer bg-black/[0.03] text-gray-600 hover:text-gray-900 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:text-white hover:bg-black/[0.06] dark:hover:bg-white/[0.09]';
+                    });
+                    btn.className = 'filter-btn px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs';
+
+                    // 过滤卡片
+                    cards.forEach(card => {
+                        const cardCat = card.getAttribute('data-category');
+                        if (category === 'all' || cardCat === category) {
+                            card.style.display = 'flex';
+                            card.classList.add('animate-in', 'fade-in', 'duration-300');
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </Layout>
